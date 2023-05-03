@@ -5,7 +5,15 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Module",
+            "name": "BarkBright",
+            "type": "python",
+            "request": "launch",
+            "module": "barkbright",
+            "args": ["--cli"],
+            "justMyCode": true
+        },
+        {
+            "name": "BB DataSet",
             "type": "python",
             "request": "launch",
             "module": "dataset",

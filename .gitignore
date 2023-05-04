@@ -165,3 +165,4 @@ dataset/dataset.json
 *.backup
 vosk-model-small-en-us-0.15
 .DS_Store
+config.json

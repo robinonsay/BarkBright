@@ -28,6 +28,8 @@ args = parser.parse_args()
 
 if args.cli:
     cli.main(train=args.train)
+elif args.train:
+    cli.train()
 else:
-    demo.main(train=args.train)
+    demo.main()
 

@@ -21,6 +21,16 @@ from barkbright.models.intent import IntentMatchingModel
 from barkbright import parsing
 from dataset import BB_INTENTS
 
+def train():
+    intent_model = IntentMatchingModel()
+    if train:
+        print('Training...')
+        start = datetime.now()
+        intent_model.train()
+        delta = datetime.now() - start
+        intent_model.save()
+        print(f" Training Time: {delta.total_seconds()}:.1f")
+
 def main(train=False):
     intent_model = IntentMatchingModel()
     if train:
@@ -28,8 +38,8 @@ def main(train=False):
         start = datetime.now()
         intent_model.train()
         delta = datetime.now() - start
-        print(f" Training Time: {delta.total_seconds()}:.1f")
         intent_model.save()
+        print(f" Training Time: {delta.total_seconds()}:.1f")
     else:
         intent_model.load()
     phrases = list()

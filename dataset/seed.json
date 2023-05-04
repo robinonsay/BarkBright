@@ -80,9 +80,13 @@
         "<prephrase> <set> <prep> color",
         "<prephrase> <set> <prep> color to <color>",
         "<set> <prep> color <postphrase>",
-        "<set> <prep> to <color> <postphrase>",
+        "<set> <prep> <color> to <postphrase>",
         "<prephrase> <set> <prep> color <postphrase>",
-        "<prephrase> <set> <prep> color to <color> <postphrase>"
+        "<prephrase> <set> <prep> color to <color> <postphrase>",
+        "<set> <prep> <light> to <color>",
+        "<prephrase> <set> <prep> <light> to <color>",
+        "<set> <prep> <light> to <color> <postphrase>",
+        "<prephrase> <set> <prep> <light> to <color> <postphrase>"
     ],
     "mode": [
         "<set> mode",
@@ -95,7 +99,11 @@
         "<set> <prep> mode <postphrase>",
         "<set> <prep> mode to <mode> <postphrase>",
         "<prephrase> <set> <prep> mode <postphrase>",
-        "<prephrase> <set> <prep> mode to <mode> <postphrase>"
+        "<prephrase> <set> <prep> mode to <mode> <postphrase>",
+        "<set> <prep> <light> to <mode>",
+        "<prephrase> <set> <prep> <light> to <mode>",
+        "<set> <prep> <light> to <mode> <postphrase>",
+        "<prephrase> <set> <prep> <light> to <mode> <postphrase>"
     ],
     "unknown": [
         "i would like to increase my effort",

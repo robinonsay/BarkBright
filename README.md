@@ -2,15 +2,13 @@
 BarkBright is an open-source voice enabled conversational system allowing for home IoT control. BarkBright utilizes natural language processing techniques inorder to deliver an intuitive and user-friendly expierence.
 
 ## Features
+* **Voice control:** BarkBright uses [vosk](https://alphacephei.com/vosk/) offline Automatic Speech Recognition (ASR)
 * **Lightweight:** BarkBright is designed to run on embedded architectures like the Raspberry Pi and BeagleBone Black, therefore it **does not require a GPU to train or run the models**
 * **Pretrained Intent Model:** BarkBright has a [pretrained model](barkbright/models/assets) availble for use, as well as all the model details so you can build on top of the architecture!
 
 ## *Future Features*
 
-* **Voice control:** BarkBright uses [vosk](https://alphacephei.com/vosk/) offline Automatic Speech Recognition (ASR)
 *  **Dialogue-based interaction:** Users can engage in a conversational manner with BarkBright. This allows for intuitive control of home IoT
-* **Lightweight:** BarkBright is designed to run on embedded architectures like the Raspberry Pi and BeagleBone Black, therefore it **does not require a GPU to train or run the models**
-* **Pretrained Intent Model:** BarkBright has a [pretrained model](barkbright/models/assets) availble for use, as well as all the model details so you can build on top of the architecture!
 * **Dataset Creation and Model Updating**: BarkBright can create a dataset based on your interactions with Human-In-The-Loop feedback. This can be used to update or retrain the model completly on commonly used phrases!
 
 ## Getting Started

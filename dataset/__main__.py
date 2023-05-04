@@ -104,9 +104,9 @@ _set = KeyWord('set', [
     'change'
 ])
 
-_color = KeyWord('color', KNOWN_COLORS)
+_color = KeyWord('color', [random.choice(KNOWN_COLORS)])
 
-_mode = KeyWord('mode', KNOWN_MODES)
+_mode = KeyWord('mode', [random.choice(KNOWN_MODES)])
 
 keywords = [_on, _off, _prephrase, _postphrase, _prep, _light, _number, _set, _color, _mode]
 keyword_re = r'<\w+>'

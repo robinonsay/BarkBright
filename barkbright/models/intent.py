@@ -30,7 +30,7 @@ from dataset import bb_data_path, bb_data, BB_INTENTS
 from xgboost import XGBClassifier
 from typing import Tuple
 
-asset_path = Path(__file__).parent / Path('assets')
+asset_path = Path(__file__).parent / Path('assets/intent_model')
 
 class IntentMatchingModel(Model):
 

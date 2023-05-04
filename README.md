@@ -24,10 +24,17 @@ BarkBright is an open-source voice enabled conversational system allowing for ho
     cd barkbright
     pip3 install -r requirements.txt
     ```
+* Run the demo
+    ```
+    python -m barkbright
+    ```
 * Run the command line chat interface demo
     ```
     python -m barkbright --cli
     ```
+
+## Demo
+The demo will use vosk and [pyaudio](https://people.csail.mit.edu/hubert/pyaudio/) to record and transcribe your voice input and use the intent model to predict the intent.
 
 ## CLI Chat Interface
 

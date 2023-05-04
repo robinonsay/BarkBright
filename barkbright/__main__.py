@@ -15,7 +15,9 @@ Copyright 2023 Robin Onsay
 '''
 
 import argparse
-from barkbright.cli import main
+from barkbright import cli
+from barkbright import demo
+
 
 parser = argparse.ArgumentParser(prog='BarkBright',
                                  description='Voice Enabled LED Light Control')
@@ -25,5 +27,7 @@ parser.add_argument('-t', '--train', action='store_true')
 args = parser.parse_args()
 
 if args.cli:
-    main(train=args.train)
+    cli.main(train=args.train)
+else:
+    demo.main(train=args.train)
 

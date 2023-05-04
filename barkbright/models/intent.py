@@ -141,17 +141,16 @@ class IntentMatchingModel(Model):
 
         
 
-    def predict(self, phrases:list, threshold=0.2) -> np.ndarray:
+    def predict(self, phrases:list, threshold=0.5) -> np.ndarray:
         df = pd.DataFrame(phrases, columns=['phrase'])
         self._preprocess(df)
         y_pred = self._pipe.predict_proba(df['phrase'])
         pred = y_pred.argmax(axis=1, keepdims=True)
-        avg = np.delete(y_pred, pred, axis=1).mean(axis=1, keepdims=True)
         labels = self._le.inverse_transform(pred.flatten())
         labels = np.expand_dims(labels, axis=1)
         pred_prob = np.take_along_axis(y_pred, pred, axis=1)
         labels = np.hstack([labels, pred_prob])
-        unknown = np.argwhere(pred_prob - avg < threshold)
+        unknown = np.argwhere(pred_prob < threshold)
         labels[unknown] = ['unknown', -1]
         return labels
 

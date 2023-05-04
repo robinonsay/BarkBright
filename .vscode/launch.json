@@ -5,11 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "BarkBright",
+            "name": "BarkBright Demo",
             "type": "python",
             "request": "launch",
             "module": "barkbright",
-            "args": ["--cli"],
+            "justMyCode": true
+        },
+        {
+            "name": "BarkBright CLI",
+            "type": "python",
+            "request": "launch",
+            "module": "barkbright",
+            "args": [
+                "--cli"
+            ],
             "justMyCode": true
         },
         {

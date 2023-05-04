@@ -1,4 +1,4 @@
-# BarkBright: Open Source Home Automation
+# BarkBright: Open Source Voice/Text Dialogue Home Automation
 BarkBright is an open-source voice enabled conversational system allowing for home IoT control. BarkBright utilizes natural language processing techniques inorder to deliver an intuitive and user-friendly expierence.
 
 ## Features

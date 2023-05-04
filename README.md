@@ -17,13 +17,13 @@ BarkBright is an open-source voice enabled conversational system allowing for ho
 
 * Clone the repo:
     ```
-    git clone https://github.com/robinonsay/barkbright.git
+    git clone https://github.com/robinonsay/BarkBright.git
     ```
 * Install Dependencies
     ```
-    cd barkbright
     pip3 install -r requirements.txt
     ```
+* Download the [ASR model](https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip) to `BarkBright/barkbright/models/assets/`
 * Run the demo
     ```
     python -m barkbright

@@ -1,14 +1,26 @@
 import json
 import re
 import random
+import nltk
 from dataset import bb_data, BB_INTENTS, bb_data_path
 from pathlib import Path
 from barkbright.colors import KNOWN_COLORS
 from barkbright.modes import KNOWN_MODES
+from nltk.corpus import brown
+nltk.download('brown')
+
+unknown_text = list()
+
+for sent in brown.sents():
+    s = ' '.join(sent)
+    s = re.sub(r'[^0-9A-Za-z\s]', '', s)
+    s = re.sub(r'\s{2,}', '', s)
+    unknown_text.append(s.lower())
 
 seed_path = Path(__file__).parent / Path('seed.json')
 with open(seed_path, 'r') as f:
     seed_data = json.load(f)
+seed_data['unknown'] += unknown_text
 
 class KeyWord:
 

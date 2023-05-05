@@ -43,27 +43,13 @@ def main(train=False):
     intent = None
 
     with Audio() as audio:
-        device_index = None
-        if bb_config['device'] == 'rpi':
-            device_name = "USB Audio Device"
-            device_index = -1
-
-            for i in range(audio.get_device_count()):
-                device_info = audio.get_device_info_by_index(i)
-                if device_name in device_info["name"]:
-                    device_index = i
-                    break
-
-            if device_index == -1:
-                print(f"Device '{device_name}' not found")
-                exit()
         with wave.open(CHIME_PATH.as_posix(), 'rb') as chime:
             chime_config = {'format':audio.get_format_from_width(chime.getsampwidth()),
                             'channels':chime.getnchannels(),
                             'rate':chime.getframerate(),
                             'output':True}
-            with Speaker(audio, **chime_config) as speaker, Microphone(audio, device_index=device_index) as mic, NeoPixelLEDStrip(LED_COUNT) as np_leds:
-                for phrase in asr.listen(mic):
+            with Speaker(audio, **chime_config) as speaker, NeoPixelLEDStrip(LED_COUNT) as np_leds:
+                for phrase in asr.listen():
                     while len(data := chime.readframes(CHUNK_SIZE)):
                         speaker.write(data)
                     if not (phrase == '' or phrase is None):

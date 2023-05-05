@@ -17,7 +17,7 @@ import json
 import pyaudio
 from pathlib import Path
 
-CHUNK_SIZE = 4096
+CHUNK_SIZE = 1024
 IN_RATE = 44100
 OUT_RATE = 44100
 CONFIG_PATH = Path(__file__).parent / Path('../config.json')
@@ -55,20 +55,13 @@ class Speaker:
         self._stream.close()
 
 class Microphone:
-    def __init__(self, audio, rate=IN_RATE, chunk=CHUNK_SIZE, device_index=None):
+    def __init__(self, audio, **kwargs):
         self._audio = audio
         self._stream = None
-        self._rate = rate
-        self._chunk=1024
-        self._device_index = device_index
+        self._kwargs = kwargs
 
     def __enter__(self):
-        self._stream = self._audio.open(format=pyaudio.paInt16,
-                                        channels=1,
-                                        rate=self._rate,
-                                        input=True,
-                                        frames_per_buffer=self._chunk,
-                                        input_device_index=self._device_index)
+        self._stream = self._audio.open(**self._kwargs)
         return self._stream
 
     def __exit__(self, exc_type, exc_value, traceback):

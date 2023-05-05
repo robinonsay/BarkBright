@@ -19,7 +19,6 @@ import numpy as np
 from datetime import datetime
 from barkbright.models.intent import IntentMatchingModel
 from barkbright import Audio, Speaker, Microphone, CHIME_PATH
-from barkbright.models import tts
 from barkbright import parsing
 from dataset import BB_INTENTS
 from barkbright.models import asr
@@ -53,18 +52,11 @@ def main(train=False):
                     print(f"Intent: {intent[i,0]}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
                     intent_str = intent[i,0]
                     if intent_str == 'on':
-                        tts.tts(speaker, "Turning the lights on.")
                         np_leds[:] = COLOR_MAP['white']
                     elif intent_str == 'off':
-                        tts.tts(speaker, "Turning the lights off.")
                         np_leds[:] = COLOR_MAP['black']
                     elif intent_str == 'color':
-                        tts.tts(speaker, "Changing the lights color.")
                         words = p.split()
                         for word in words:
                             if word in COLOR_MAP:
                                 np_leds[:] = COLOR_MAP[word]
-                    else:
-                        tts.tts(speaker, "Sorry, I didn't understand.")
-            else:
-                tts.tts(speaker, "Hello!")

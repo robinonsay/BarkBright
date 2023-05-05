@@ -18,11 +18,15 @@ import json
 import re
 import random
 import nltk
-from dataset import bb_data, BB_INTENTS, bb_data_path
+from dataset import BB_INTENTS
 from pathlib import Path
 from barkbright.colors import KNOWN_COLORS
 from barkbright.modes import KNOWN_MODES
 from nltk.corpus import brown
+bb_data_path = Path(__file__).parent / Path('dataset.json')
+
+with open(bb_data_path, 'r') as f:
+    bb_data = json.load(f)
 nltk.download('brown')
 
 unknown_text = list()

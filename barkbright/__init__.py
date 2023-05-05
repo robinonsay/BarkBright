@@ -19,6 +19,7 @@ from pathlib import Path
 
 CONFIG_PATH = Path(__file__).parent / Path('../config.json')
 MODEL_PATH = Path(__file__).parent / Path('models/assets/vosk-model-small-en-us-0.15')
+CHIME_PATH = Path(__file__).parent / Path('../sounds/chime.wav')
 
 with open(CONFIG_PATH, 'r') as f:
     bb_config = json.load(f)

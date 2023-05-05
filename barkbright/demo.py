@@ -13,19 +13,18 @@ Copyright 2023 Robin Onsay
    See the License for the specific language governing permissions and
    limitations under the License.
 '''
-
+import wave
 import json
 import numpy as np
 from datetime import datetime
 from barkbright.models.intent import IntentMatchingModel
-from barkbright import Audio, Speaker, Microphone
+from barkbright import Audio, Speaker, Microphone, CHIME_PATH
 from barkbright.models import tts
 from barkbright import parsing
 from dataset import BB_INTENTS
 from barkbright.models import asr
 from barkbright.iot.neopixel import NeoPixelLEDStrip, LED_COUNT
 from barkbright.colors import COLOR_MAP
-
 
 def main(train=False):
     intent_model = IntentMatchingModel()
@@ -43,8 +42,10 @@ def main(train=False):
     data = list()
     intent = None
 
-    with Audio() as audio, Speaker(audio) as speaker, Microphone(audio) as mic, NeoPixelLEDStrip(LED_COUNT) as np_leds:
+    with Audio() as audio, Speaker(audio) as speaker, Microphone(audio) as mic, NeoPixelLEDStrip(LED_COUNT) as np_leds, wave.open(CHIME_PATH, 'rb') as chime:
         for phrase in asr.listen(mic):
+            while len(data := chime.readframes(1024)):
+                speaker.write(data)
             if not (phrase == '' or phrase is None):
                 sub_phrases = parsing.split_on_conj(phrase)
                 intent = intent_model.predict(sub_phrases)
@@ -65,3 +66,5 @@ def main(train=False):
                                 np_leds[:] = COLOR_MAP[word]
                     else:
                         tts.tts(speaker, "Sorry, I didn't understand.")
+            else:
+                tts.tts(speaker, "Hello!")

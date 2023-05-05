@@ -43,8 +43,19 @@ def main(train=False):
     intent = None
 
     with Audio() as audio:
-        print(audio.get_sample_size(pyaudio.paInt16))
-        with Speaker(audio) as speaker, Microphone(audio) as mic, NeoPixelLEDStrip(LED_COUNT) as np_leds, wave.open(CHIME_PATH.as_posix(), 'rb') as chime:
+        device_name = "USB Audio Device"
+        device_index = -1
+
+        for i in range(p.get_device_count()):
+            device_info = p.get_device_info_by_index(i)
+            if device_info["name"] == device_name:
+                device_index = i
+                break
+
+        if device_index == -1:
+            print(f"Device '{device_name}' not found")
+            exit()
+        with Speaker(audio, device_index=device_index) as speaker, Microphone(audio, device_index=device_index) as mic, NeoPixelLEDStrip(LED_COUNT) as np_leds, wave.open(CHIME_PATH.as_posix(), 'rb') as chime:
             for phrase in asr.listen(mic):
                 while len(data := chime.readframes(CHUNK_SIZE)):
                     speaker.write(data)

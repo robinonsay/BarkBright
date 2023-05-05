@@ -22,6 +22,8 @@ from scipy import signal
 import numpy as np
 from barkbright import bb_config, MODEL_PATH, CHUNK_SIZE, IN_RATE
 
+MODEL_RATE = 16000
+
 def listen(mic:pyaudio.Stream, model_path=None) -> str:
     model = model_path if model_path else Model(model_path=MODEL_PATH.as_posix())
     recognizer = KaldiRecognizer(model, IN_RATE)
@@ -32,9 +34,12 @@ def listen(mic:pyaudio.Stream, model_path=None) -> str:
         f.setsampwidth(2)
         f.setframerate(IN_RATE)
         while True:
-            raw_audio = mic.read(CHUNK_SIZE, exception_on_overflow=False)
-            f.writeframes(raw_audio)
-            if recognizer.AcceptWaveform(raw_audio):
+            audio = mic.read(CHUNK_SIZE, exception_on_overflow=False)
+            np_audio = np.frombuffer(audio, dtype=np.int16)
+            np_audio = signal.decimate(np_audio, IN_RATE // MODEL_RATE)
+            audio = np_audio.tobytes()
+            f.writeframes(audio)
+            if recognizer.AcceptWaveform(audio):
                 result = json.loads(recognizer.Result())['text'].split()
                 if result and bb_config['wakeword'] == result[0]:
                     result.pop(0)

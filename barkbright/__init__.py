@@ -18,7 +18,7 @@ import pyaudio
 from pathlib import Path
 
 CHUNK_SIZE = 1024
-IN_RATE = 16000
+IN_RATE = 48000
 OUT_RATE = 44100
 CONFIG_PATH = Path(__file__).parent / Path('../config.json')
 MODEL_PATH = Path(__file__).parent / Path('models/assets/vosk-model-small-en-us-0.15')

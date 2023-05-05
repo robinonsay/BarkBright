@@ -57,22 +57,27 @@ def main(train=False):
             if device_index == -1:
                 print(f"Device '{device_name}' not found")
                 exit()
-        with Speaker(audio, device_index=device_index) as speaker, Microphone(audio, device_index=device_index) as mic, NeoPixelLEDStrip(LED_COUNT) as np_leds, wave.open(CHIME_PATH.as_posix(), 'rb') as chime:
-            for phrase in asr.listen(mic):
-                while len(data := chime.readframes(CHUNK_SIZE)):
-                    speaker.write(data)
-                if not (phrase == '' or phrase is None):
-                    sub_phrases = parsing.split_on_conj(phrase)
-                    intent = intent_model.predict(sub_phrases)
-                    for i, p in enumerate(sub_phrases):
-                        print(f"Intent: {intent[i,0]}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
-                        intent_str = intent[i,0]
-                        if intent_str == 'on':
-                            np_leds[:] = COLOR_MAP['white']
-                        elif intent_str == 'off':
-                            np_leds[:] = COLOR_MAP['black']
-                        elif intent_str == 'color':
-                            words = p.split()
-                            for word in words:
-                                if word in COLOR_MAP:
-                                    np_leds[:] = COLOR_MAP[word]
+        with wave.open(CHIME_PATH.as_posix(), 'rb') as chime:
+            chime_config = {'format':audio.get_format_from_width(chime.getsampwidth()),
+                            'channels':chime.getnchannels(),
+                            'rate':chime.getframerate(),
+                            'output':True}
+            with Speaker(audio, **chime_config) as speaker, Microphone(audio, device_index=device_index) as mic, NeoPixelLEDStrip(LED_COUNT) as np_leds:
+                for phrase in asr.listen(mic):
+                    while len(data := chime.readframes(CHUNK_SIZE)):
+                        speaker.write(data)
+                    if not (phrase == '' or phrase is None):
+                        sub_phrases = parsing.split_on_conj(phrase)
+                        intent = intent_model.predict(sub_phrases)
+                        for i, p in enumerate(sub_phrases):
+                            print(f"Intent: {intent[i,0]}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
+                            intent_str = intent[i,0]
+                            if intent_str == 'on':
+                                np_leds[:] = COLOR_MAP['white']
+                            elif intent_str == 'off':
+                                np_leds[:] = COLOR_MAP['black']
+                            elif intent_str == 'color':
+                                words = p.split()
+                                for word in words:
+                                    if word in COLOR_MAP:
+                                        np_leds[:] = COLOR_MAP[word]

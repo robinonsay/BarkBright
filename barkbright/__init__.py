@@ -41,17 +41,13 @@ class Audio:
     
 
 class Speaker:
-    def __init__(self, audio, device_index=None):
+    def __init__(self, audio, **kwargs):
         self._audio = audio
         self._stream = None
-        self._device_index = device_index
+        self._kwargs = kwargs
 
     def __enter__(self):
-        self._stream = self._audio.open(format=pyaudio.paFloat32,
-                                  channels=1,
-                                  rate=OUT_RATE,  # Ensure this rate matches the sample rate of the TTS model
-                                  output=True,
-                                  input_device_index=self._device_index)
+        self._stream = self._audio.open(**self._kwargs)
         return self._stream
 
     def __exit__(self, exc_type, exc_value, traceback):

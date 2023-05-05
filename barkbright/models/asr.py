@@ -15,6 +15,7 @@ limitations under the License.
 '''
 import wave
 import pyaudio
+import librosa
 import json
 from vosk import Model, KaldiRecognizer
 from pathlib import Path
@@ -38,7 +39,8 @@ def listen(mic:pyaudio.Stream, model_path=None) -> str:
             audio = mic.read(CHUNK_SIZE, exception_on_overflow=False)
             np_audio = np.frombuffer(audio, dtype=np.int16)
             np_audio_float = np_audio.astype(np.float32, order='C') / MAX_INT16
-            np_audio_float = signal.resample_poly(np_audio_float, MODEL_RATE, IN_RATE)
+            np_audio_float = librosa.resample(np_audio_float, orig_sr=IN_RATE, target_sr=MODEL_RATE)
+            # np_audio_float = signal.resample_poly(np_audio_float, MODEL_RATE, IN_RATE)
             np_audio = (np_audio_float * MAX_INT16).astype(np.int16)
             audio = np_audio.tobytes()
             f.writeframes(audio)

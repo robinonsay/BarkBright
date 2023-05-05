@@ -62,7 +62,7 @@ def main(train=False):
                             'rate':chime.getframerate(),
                             'output':True,
                             'output_device_index': device_index}
-            with Speaker(audio, **chime_config) as speaker, NeoPixelLEDStrip(LED_COUNT) as np_leds:
+            with Speaker(audio, **chime_config) as speaker, NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
                 for phrase in asr.listen():
                     if not (phrase == '' or phrase is None):
                         sub_phrases = parsing.split_on_conj(phrase)

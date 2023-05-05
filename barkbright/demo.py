@@ -50,7 +50,7 @@ def main(train=False):
 
             for i in range(audio.get_device_count()):
                 device_info = audio.get_device_info_by_index(i)
-                if device_info["name"] == device_name:
+                if device_name in device_info["name"]:
                     device_index = i
                     break
 

@@ -30,17 +30,23 @@ def listen(mic:pyaudio.Stream, model_path=None) -> str:
     recognizer = KaldiRecognizer(model, IN_RATE)
     recognizer.SetWords(True)
     recognizer.SetPartialWords(True)
-    while True:
-        audio = mic.read(CHUNK_SIZE, exception_on_overflow=False)
-        np_audio = np.frombuffer(audio, dtype=np.int16)
-        np_audio_float = np_audio.astype(np.float32, order='C') / MAX_INT16
-        np_audio_float = signal.decimate(np_audio_float, IN_RATE // MODEL_RATE)
-        np_audio = (np_audio_float * MAX_INT16).astype(np.int16)
-        audio = np_audio.tobytes()
-        if recognizer.AcceptWaveform(audio):
-            result = json.loads(recognizer.Result())['text'].split()
-            if result and bb_config['wakeword'] == result[0]:
-                result.pop(0)
-                phrase = ' '.join(result)
-                print(phrase)
-                yield phrase
+    with wave.open('test.wav', 'wb') as f:
+        f.setnchannels(1)
+        f.setsampwidth(2)
+        f.setframerate(MODEL_RATE)
+        while True:
+            audio = mic.read(CHUNK_SIZE, exception_on_overflow=False)
+            np_audio = np.frombuffer(audio, dtype=np.int16)
+            np_audio_float = np_audio.astype(np.float32, order='C') / MAX_INT16
+            np_audio_float = signal.decimate(np_audio_float, IN_RATE // MODEL_RATE)
+            np_audio = (np_audio_float * MAX_INT16).astype(np.int16)
+            audio = np_audio.tobytes()
+            f.writeframes(audio)
+            if recognizer.AcceptWaveform(audio):
+                result = json.loads(recognizer.Result())['text'].split()
+                print(result)
+                if result and bb_config['wakeword'] == result[0]:
+                    result.pop(0)
+                    phrase = ' '.join(result)
+                    print(phrase)
+                    yield phrase

@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 '''
 import json
+import pyaudio
 from pathlib import Path
 
 CONFIG_PATH = Path(__file__).parent / Path('../config.json')
@@ -21,4 +22,54 @@ MODEL_PATH = Path(__file__).parent / Path('models/assets/vosk-model-small-en-us-
 
 with open(CONFIG_PATH, 'r') as f:
     bb_config = json.load(f)
+
+class Audio:
+
+    def __init__(self) -> None:
+        self._audio = None
+
+    def __enter__(self):
+        self._audio = pyaudio.PyAudio()
+        return self._audio
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        self._audio.terminate()
+    
+
+class Speaker:
+    def __init__(self, audio):
+        self._audio = audio
+        self._stream = None
+
+    def __enter__(self):
+        self._stream = self._audio.open(format=pyaudio.paFloat32,
+                                  channels=1,
+                                  rate=22050,  # Ensure this rate matches the sample rate of the TTS model
+                                  output=True)
+        return self._stream
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self._stream.stop_stream()
+        self._stream.close()
+
+class Microphone:
+    def __init__(self, audio, rate=16000, chunk=1024, device_index=None):
+        self._audio = audio
+        self._stream = None
+        self._rate = rate
+        self._chunk=1024
+        self._device_index = device_index
+
+    def __enter__(self):
+        self._stream = self._audio.open(format=pyaudio.paInt16,
+                                        channels=1,
+                                        rate=self._rate,
+                                        input=True,
+                                        frames_per_buffer=self._chunk,
+                                        input_device_index=self._device_index)
+        return self._stream
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self._stream.stop_stream()
+        self._stream.close()
 

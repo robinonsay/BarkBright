@@ -18,6 +18,8 @@ import json
 import numpy as np
 from datetime import datetime
 from barkbright.models.intent import IntentMatchingModel
+from barkbright import Audio, Speaker, Microphone
+from barkbright.models import tts
 from barkbright import parsing
 from dataset import BB_INTENTS
 from barkbright.models import asr
@@ -38,10 +40,14 @@ def main(train=False):
     num_new_phrases = 0
     data = list()
     intent = None
-    for phrase in asr.listen():
-        if not (phrase == '' or phrase is None):
-            sub_phrases = parsing.split_on_conj(phrase)
-            intent = intent_model.predict(sub_phrases)
-            for i, p in enumerate(sub_phrases):
-                print(f"Intent: {intent[i,0]}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
-
+    with Audio() as audio:
+        with Speaker(audio) as speaker:
+            with Microphone(audio) as mic:
+                for phrase in asr.listen(mic):
+                    if not (phrase == '' or phrase is None):
+                        sub_phrases = parsing.split_on_conj(phrase)
+                        intent = intent_model.predict(sub_phrases)
+                        for i, p in enumerate(sub_phrases):
+                            print(f"Intent: {intent[i,0]}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
+                            output_phrase = f"{intent[i,0]}."
+                            tts.tts(speaker, output_phrase)

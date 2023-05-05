@@ -19,31 +19,17 @@ from vosk import Model, KaldiRecognizer
 from pathlib import Path
 from barkbright import bb_config, MODEL_PATH
 
-def listen(model_path=None, rate=16000, chunk=1024, device_index=None) -> str:
+def listen(mic:pyaudio.Stream, model_path=None, rate=16000, chunk=1024, device_index=None) -> str:
     model = model_path if model_path else Model(model_path=MODEL_PATH.as_posix())
     recognizer = KaldiRecognizer(model, rate)
     recognizer.SetWords(True)
     recognizer.SetPartialWords(True)
-    p = pyaudio.PyAudio()
-    stream = p.open(format=pyaudio.paInt16,
-                    channels=1,
-                    rate=rate,
-                    input=True,
-                    frames_per_buffer=chunk,
-                    input_device_index=device_index)
-    try:
-        while True:
-            data = stream.read(chunk, exception_on_overflow=False)
-            if recognizer.AcceptWaveform(data):
-                result = json.loads(recognizer.Result())['text'].split()
-                if result and bb_config['wakeword'] == result[0]:
-                    result.pop(0)
-                    phrase = ' '.join(result)
-                    print(phrase)
-                    yield phrase
-            # else:
-            #     partial_result = json.loads(recognizer.PartialResult())
-    finally:
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
+    while True:
+        data = mic.read(chunk, exception_on_overflow=False)
+        if recognizer.AcceptWaveform(data):
+            result = json.loads(recognizer.Result())['text'].split()
+            if result and bb_config['wakeword'] == result[0]:
+                result.pop(0)
+                phrase = ' '.join(result)
+                print(phrase)
+                yield phrase

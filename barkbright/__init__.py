@@ -17,7 +17,7 @@ import json
 import pyaudio
 from pathlib import Path
 
-CHUNK_SIZE = 1024
+CHUNK_SIZE = 4096
 IN_RATE = 44100
 OUT_RATE = 44100
 CONFIG_PATH = Path(__file__).parent / Path('../config.json')

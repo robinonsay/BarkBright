@@ -46,8 +46,8 @@ def main(train=False):
         device_name = "USB Audio Device"
         device_index = -1
 
-        for i in range(p.get_device_count()):
-            device_info = p.get_device_info_by_index(i)
+        for i in range(audio.get_device_count()):
+            device_info = audio.get_device_info_by_index(i)
             if device_info["name"] == device_name:
                 device_index = i
                 break

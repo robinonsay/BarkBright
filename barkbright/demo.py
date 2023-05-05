@@ -68,17 +68,17 @@ def main(train=False):
                         sub_phrases = parsing.split_on_conj(phrase)
                         intent = intent_model.predict(sub_phrases)
                         for i, p in enumerate(sub_phrases):
-                            print(f"Intent: {intent[i,0]}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
                             intent_str = intent[i,0]
+                            print(f"Intent: {intent_str}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
                             if intent_str != 'unknown':
                                 while len(data := chime.readframes(CHUNK_SIZE)):
                                     speaker.write(data)
                             if intent_str == 'on':
-                                np_leds[0:-1] = COLOR_MAP['white']
+                                np_leds[:] = COLOR_MAP['white']
                             elif intent_str == 'off':
-                                np_leds[0:-1] = COLOR_MAP['black']
+                                np_leds[:] = COLOR_MAP['black']
                             elif intent_str == 'color':
                                 words = p.split()
                                 for word in words:
                                     if word in COLOR_MAP:
-                                        np_leds[0:-1] = COLOR_MAP[word]
+                                        np_leds[:] = COLOR_MAP[word]

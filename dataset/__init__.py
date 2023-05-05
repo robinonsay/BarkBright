@@ -13,6 +13,15 @@ Copyright 2023 Robin Onsay
    See the License for the specific language governing permissions and
    limitations under the License.
 '''
+
+import json
+from pathlib import Path
+
+bb_data_path = Path(__file__).parent / Path('dataset.json')
+
+with open(bb_data_path, 'r') as f:
+    bb_data = json.load(f)
+
 BB_INTENTS = (
     'on',
     'off',

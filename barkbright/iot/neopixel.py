@@ -46,7 +46,7 @@ class NeoPixelLEDStrip:
     def __setitem__(self, index, value):
         if isinstance(index, slice):
             for i in range(index.start, index.stop, index.step):
-                self._pixel_strip.setPixelColor(i, value)
+                self._pixel_strip.setPixelColor(i, Color(*value))
         else:
-            self._pixel_strip.setPixelColor(index, value)
+            self._pixel_strip.setPixelColor(index, Color(*value))
         self._pixel_strip.show()

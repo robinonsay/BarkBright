@@ -14,7 +14,7 @@ Copyright 2023 Robin Onsay
    limitations under the License.
 '''
 import wave
-import json
+import pyaudio
 import numpy as np
 from datetime import datetime
 from barkbright.models.intent import IntentMatchingModel
@@ -26,6 +26,7 @@ from barkbright.iot.neopixel import NeoPixelLEDStrip, LED_COUNT
 from barkbright.colors import COLOR_MAP
 
 def main(train=False):
+    global SAMP_WIDTH
     intent_model = IntentMatchingModel()
     if train:
         print('Training...')
@@ -42,6 +43,7 @@ def main(train=False):
     intent = None
 
     with Audio() as audio:
+        print(audio.get_sample_size(pyaudio.paInt16))
         with Speaker(audio) as speaker, Microphone(audio) as mic, NeoPixelLEDStrip(LED_COUNT) as np_leds, wave.open(CHIME_PATH.as_posix(), 'rb') as chime:
             for phrase in asr.listen(mic):
                 while len(data := chime.readframes(CHUNK_SIZE)):

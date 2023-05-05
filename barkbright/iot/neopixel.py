@@ -4,10 +4,11 @@
 #
 # Direct port of the Arduino NeoPixel library strandtest example.  Showcases
 # various animations on a strip of NeoPixels.
-
+from barkbright import bb_config
 import time
-from rpi_ws281x import PixelStrip, Color
-import argparse
+IS_RPI = bb_config['device'] == 'rpi'
+if IS_RPI:
+    from rpi_ws281x import PixelStrip, Color
 
 # LED strip configuration:
 LED_COUNT = 16       # Number of LED pixels.
@@ -32,22 +33,25 @@ class NeoPixelLEDStrip:
         self._pixel_strip = None
     
     def __enter__(self):
-        self._pixel_strip = PixelStrip(self._count, self._pin, self._freq_hz, self._dma, self._invert, self._brightness, self._channel)
-        self._pixel_strip.begin()
+        if IS_RPI:
+            self._pixel_strip = PixelStrip(self._count, self._pin, self._freq_hz, self._dma, self._invert, self._brightness, self._channel)
+            self._pixel_strip.begin()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        for i in range(self._pixel_strip.numPixels()):
-            self._pixel_strip.setPixelColor(i, Color(0,0,0))
-        self._pixel_strip.show()
+        if IS_RPI:
+            for i in range(self._pixel_strip.numPixels()):
+                self._pixel_strip.setPixelColor(i, Color(0,0,0))
+            self._pixel_strip.show()
 
     def __getitem__(self, index):
         pass
 
     def __setitem__(self, index, value):
-        if isinstance(index, slice):
-            for i in range(index.start, index.stop, index.step):
-                self._pixel_strip.setPixelColor(i, Color(*value))
-        else:
-            self._pixel_strip.setPixelColor(index, Color(*value))
-        self._pixel_strip.show()
+        if IS_RPI:
+            if isinstance(index, slice):
+                    for i in range(index.start, index.stop, index.step):
+                        self._pixel_strip.setPixelColor(i, Color(*value))
+            else:
+                self._pixel_strip.setPixelColor(index, Color(*value))
+            self._pixel_strip.show()

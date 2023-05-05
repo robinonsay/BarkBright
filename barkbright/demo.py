@@ -64,14 +64,15 @@ def main(train=False):
                             'output_device_index': device_index}
             with Speaker(audio, **chime_config) as speaker, NeoPixelLEDStrip(LED_COUNT) as np_leds:
                 for phrase in asr.listen():
-                    while len(data := chime.readframes(CHUNK_SIZE)):
-                        speaker.write(data)
                     if not (phrase == '' or phrase is None):
                         sub_phrases = parsing.split_on_conj(phrase)
                         intent = intent_model.predict(sub_phrases)
                         for i, p in enumerate(sub_phrases):
                             print(f"Intent: {intent[i,0]}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
                             intent_str = intent[i,0]
+                            if intent_str != 'unknown':
+                                while len(data := chime.readframes(CHUNK_SIZE)):
+                                    speaker.write(data)
                             if intent_str == 'on':
                                 np_leds[0:-1] = COLOR_MAP['white']
                             elif intent_str == 'off':

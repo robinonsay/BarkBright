@@ -35,31 +35,26 @@ def listen(model_path=None) -> str:
     parent_conn, child_conn = Pipe()
     prcs = Process(target=process_audio, args=(child_conn,))
     prcs.start()
-    with wave.open('test.wav', 'wb') as f:
-        f.setnchannels(1)
-        f.setsampwidth(2)
-        f.setframerate(MODEL_RATE)
-        try:
-            while True:
-                audio = b''
-                while parent_conn.poll():
-                    audio += parent_conn.recv_bytes()
-                np_audio = np.frombuffer(audio, dtype=np.int16)
-                np_audio_float = np_audio.astype(np.float32, order='C') / MAX_INT16
-                np_audio_float = signal.resample_poly(np_audio_float, MODEL_RATE, IN_RATE)
-                np_audio = (np_audio_float * MAX_INT16).astype(np.int16)
-                audio = np_audio.tobytes()
-                f.writeframes(audio)
-                if recognizer.AcceptWaveform(audio):
-                    result = json.loads(recognizer.Result())['text'].split()
-                    print(result)
-                    if result and bb_config['wakeword'] == result[0]:
-                        print('AWAKE')
-                        result.pop(0)
-                        phrase = ' '.join(result)
-                        yield phrase
-        finally:
-            parent_conn.send(False)
+    try:
+        while True:
+            audio = b''
+            while parent_conn.poll():
+                audio += parent_conn.recv_bytes()
+            np_audio = np.frombuffer(audio, dtype=np.int16)
+            np_audio_float = np_audio.astype(np.float32, order='C') / MAX_INT16
+            np_audio_float = signal.resample_poly(np_audio_float, MODEL_RATE, IN_RATE)
+            np_audio = (np_audio_float * MAX_INT16).astype(np.int16)
+            audio = np_audio.tobytes()
+            if recognizer.AcceptWaveform(audio):
+                result = json.loads(recognizer.Result())['text'].split()
+                print(result)
+                if result and bb_config['wakeword'] == result[0]:
+                    print('AWAKE')
+                    result.pop(0)
+                    phrase = ' '.join(result)
+                    yield phrase
+    finally:
+        parent_conn.send(False)
 
 def process_audio(conn: Connection):
     run = True

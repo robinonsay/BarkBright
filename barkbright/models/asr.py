@@ -27,7 +27,7 @@ MAX_INT16 = (2**15 - 1)
 
 def listen(mic:pyaudio.Stream, model_path=None) -> str:
     model = model_path if model_path else Model(model_path=MODEL_PATH.as_posix())
-    recognizer = KaldiRecognizer(model, IN_RATE)
+    recognizer = KaldiRecognizer(model, MODEL_RATE)
     recognizer.SetWords(True)
     recognizer.SetPartialWords(True)
     with wave.open('test.wav', 'wb') as f:

@@ -166,3 +166,4 @@ dataset/dataset.json
 .DS_Store
 config.json
 *.key
+porcupine_model

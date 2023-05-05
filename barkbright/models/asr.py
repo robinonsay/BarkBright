@@ -32,7 +32,7 @@ def listen(mic:pyaudio.Stream, model_path=None) -> str:
     with wave.open('test.wav', 'wb') as f:
         f.setnchannels(1)
         f.setsampwidth(2)
-        f.setframerate(IN_RATE)
+        f.setframerate(MODEL_RATE)
         while True:
             audio = mic.read(CHUNK_SIZE, exception_on_overflow=False)
             np_audio = np.frombuffer(audio, dtype=np.int16)

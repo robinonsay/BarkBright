@@ -163,6 +163,7 @@ dataset/dataset.json
 *.prepipe
 *.le
 *.backup
+vosk-model-small-en-us-0.15
 .DS_Store
 config.json
 *.key

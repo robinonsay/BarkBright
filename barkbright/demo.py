@@ -18,7 +18,7 @@ import json
 import numpy as np
 from datetime import datetime
 from barkbright.models.intent import IntentMatchingModel
-from barkbright import Audio, Speaker, Microphone, CHIME_PATH
+from barkbright import Audio, Speaker, Microphone, CHIME_PATH, CHUNK_SIZE
 from barkbright import parsing
 from dataset import BB_INTENTS
 from barkbright.models import asr
@@ -41,22 +41,23 @@ def main(train=False):
     data = list()
     intent = None
 
-    with Audio() as audio, Speaker(audio) as speaker, Microphone(audio) as mic, NeoPixelLEDStrip(LED_COUNT) as np_leds, wave.open(CHIME_PATH, 'rb') as chime:
-        for phrase in asr.listen(mic):
-            while len(data := chime.readframes(1024)):
-                speaker.write(data)
-            if not (phrase == '' or phrase is None):
-                sub_phrases = parsing.split_on_conj(phrase)
-                intent = intent_model.predict(sub_phrases)
-                for i, p in enumerate(sub_phrases):
-                    print(f"Intent: {intent[i,0]}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
-                    intent_str = intent[i,0]
-                    if intent_str == 'on':
-                        np_leds[:] = COLOR_MAP['white']
-                    elif intent_str == 'off':
-                        np_leds[:] = COLOR_MAP['black']
-                    elif intent_str == 'color':
-                        words = p.split()
-                        for word in words:
-                            if word in COLOR_MAP:
-                                np_leds[:] = COLOR_MAP[word]
+    with Audio() as audio:
+        with Speaker(audio) as speaker, Microphone(audio) as mic, NeoPixelLEDStrip(LED_COUNT) as np_leds, wave.open(CHIME_PATH.as_posix(), 'rb') as chime:
+            for phrase in asr.listen(mic):
+                while len(data := chime.readframes(CHUNK_SIZE)):
+                    speaker.write(data)
+                if not (phrase == '' or phrase is None):
+                    sub_phrases = parsing.split_on_conj(phrase)
+                    intent = intent_model.predict(sub_phrases)
+                    for i, p in enumerate(sub_phrases):
+                        print(f"Intent: {intent[i,0]}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
+                        intent_str = intent[i,0]
+                        if intent_str == 'on':
+                            np_leds[:] = COLOR_MAP['white']
+                        elif intent_str == 'off':
+                            np_leds[:] = COLOR_MAP['black']
+                        elif intent_str == 'color':
+                            words = p.split()
+                            for word in words:
+                                if word in COLOR_MAP:
+                                    np_leds[:] = COLOR_MAP[word]

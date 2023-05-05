@@ -17,6 +17,8 @@ import json
 import pyaudio
 from pathlib import Path
 
+CHUNK_SIZE = 4096
+RATE = 44100
 CONFIG_PATH = Path(__file__).parent / Path('../config.json')
 MODEL_PATH = Path(__file__).parent / Path('models/assets/vosk-model-small-en-us-0.15')
 CHIME_PATH = Path(__file__).parent / Path('../sounds/chime.wav')
@@ -45,7 +47,7 @@ class Speaker:
     def __enter__(self):
         self._stream = self._audio.open(format=pyaudio.paFloat32,
                                   channels=1,
-                                  rate=22050,  # Ensure this rate matches the sample rate of the TTS model
+                                  rate=RATE,  # Ensure this rate matches the sample rate of the TTS model
                                   output=True)
         return self._stream
 
@@ -54,7 +56,7 @@ class Speaker:
         self._stream.close()
 
 class Microphone:
-    def __init__(self, audio, rate=16000, chunk=1024, device_index=None):
+    def __init__(self, audio, rate=RATE, chunk=CHUNK_SIZE, device_index=None):
         self._audio = audio
         self._stream = None
         self._rate = rate

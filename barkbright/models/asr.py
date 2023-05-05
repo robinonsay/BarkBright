@@ -17,9 +17,9 @@ import pyaudio
 import json
 from vosk import Model, KaldiRecognizer
 from pathlib import Path
-from barkbright import bb_config, MODEL_PATH
+from barkbright import bb_config, MODEL_PATH, CHUNK_SIZE, RATE
 
-def listen(mic:pyaudio.Stream, model_path=None, rate=16000, chunk=1024, device_index=None) -> str:
+def listen(mic:pyaudio.Stream, model_path=None, rate=RATE, chunk=CHUNK_SIZE, device_index=None) -> str:
     model = model_path if model_path else Model(model_path=MODEL_PATH.as_posix())
     recognizer = KaldiRecognizer(model, rate)
     recognizer.SetWords(True)

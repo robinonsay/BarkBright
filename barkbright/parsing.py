@@ -19,7 +19,7 @@ from typing import List, Tuple
 CONJUNCTIONS = {
     "and",
     "then",
-    "so",
+    "so"
 }
 
 def split_on_conj(phrase: str) -> List[str]:

@@ -30,7 +30,7 @@ class NeoPixelLEDStrip:
 
     def __exit__(self, exc_type, exc_value, traceback):
         if IS_RPI:
-            for i in range(self._count):
+            for i in range(self._kwargs["count"]):
                 self._pixel_strip.setPixelColor(i, Color(0,0,0))
             self._pixel_strip.show()
 
@@ -40,7 +40,7 @@ class NeoPixelLEDStrip:
     def __setitem__(self, index, value):
         if IS_RPI:
             if isinstance(index, slice):
-                for i in index.indices(self._count):
+                for i in index.indices(self._kwargs["count"]):
                     self._pixel_strip.setPixelColor(i, Color(*value))
             else:
                 self._pixel_strip.setPixelColor(index, Color(*value))

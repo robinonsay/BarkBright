@@ -73,11 +73,11 @@ def main(train=False):
                             print(f"Intent: {intent[i,0]}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
                             intent_str = intent[i,0]
                             if intent_str == 'on':
-                                np_leds[:] = COLOR_MAP['white']
+                                np_leds[0:-1] = COLOR_MAP['white']
                             elif intent_str == 'off':
-                                np_leds[:] = COLOR_MAP['black']
+                                np_leds[0:-1] = COLOR_MAP['black']
                             elif intent_str == 'color':
                                 words = p.split()
                                 for word in words:
                                     if word in COLOR_MAP:
-                                        np_leds[:] = COLOR_MAP[word]
+                                        np_leds[0:-1] = COLOR_MAP[word]

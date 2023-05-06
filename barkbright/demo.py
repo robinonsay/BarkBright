@@ -24,6 +24,7 @@ from dataset import BB_INTENTS
 from barkbright.models import asr
 from barkbright.iot.neopixel import NeoPixelLEDStrip
 from barkbright.colors import COLOR_MAP
+from multiprocessing import Pipe, Process
 
 def main(train=False):
     global SAMP_WIDTH
@@ -41,7 +42,36 @@ def main(train=False):
     num_new_phrases = 0
     data = list()
     intent = None
+    parent_conn, child_conn = Pipe()
+    prcs = Process(target=process_chime, args=(child_conn,))
+    prcs.start()
+    with NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
+        try:
+            for phrase in asr.listen():
+                if not (phrase == '' or phrase is None):
+                    sub_phrases = parsing.split_on_conj(phrase)
+                    intent = intent_model.predict(sub_phrases)
+                    for i, p in enumerate(sub_phrases):
+                        intent_str = intent[i,0]
+                        print(f"Intent: {intent_str}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
+                        if intent_str != 'unknown':
+                            parent_conn.send(True)
+                        if intent_str == 'on':
+                            np_leds[:] = COLOR_MAP['white']
+                        elif intent_str == 'off':
+                            np_leds[:] = COLOR_MAP['black']
+                        elif intent_str == 'color':
+                            words = p.split()
+                            for word in words:
+                                if word in COLOR_MAP:
+                                    np_leds[:] = COLOR_MAP[word]
+        finally:
+            parent_conn.send(False)
 
+
+def process_chime(conn):
+    run = True
+    device_index = None
     with Audio() as audio:
         device_index = None
         if bb_config['device'] == 'rpi':
@@ -55,7 +85,7 @@ def main(train=False):
 
             if device_index == -1:
                 print(f"Device '{device_name}' not found")
-                exit()
+                run = False
         chime_audio = None
         with wave.open(bb_config['chime_path'], 'rb') as chime:
             chime_config = {'format':audio.get_format_from_width(chime.getsampwidth()),
@@ -63,24 +93,10 @@ def main(train=False):
                             'rate':chime.getframerate(),
                             'output':True,
                             'output_device_index': device_index}
-            chime_audio =  chime.readframes(chime.getnframes())
-        # with Speaker(audio, **chime_config) as speaker, NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
-        with NeoPixelLEDStrip(**bb_config['led_config']) as np_leds, Speaker(audio, **chime_config) as speaker:
-            for phrase in asr.listen():
-                if not (phrase == '' or phrase is None):
-                    sub_phrases = parsing.split_on_conj(phrase)
-                    intent = intent_model.predict(sub_phrases)
-                    for i, p in enumerate(sub_phrases):
-                        intent_str = intent[i,0]
-                        print(f"Intent: {intent_str}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
-                        if intent_str != 'unknown':
-                            speaker.write(chime_audio)
-                        if intent_str == 'on':
-                            np_leds[:] = COLOR_MAP['white']
-                        elif intent_str == 'off':
-                            np_leds[:] = COLOR_MAP['black']
-                        elif intent_str == 'color':
-                            words = p.split()
-                            for word in words:
-                                if word in COLOR_MAP:
-                                    np_leds[:] = COLOR_MAP[word]
+            chime_audio = chime.readframes(chime.getnframes())
+        with Speaker(audio, **chime_config) as speaker:
+            while run:
+                run = conn.recv()
+                if run:
+                    speaker.write(chime_audio)
+

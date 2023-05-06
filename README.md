@@ -12,7 +12,7 @@ BarkBright is an open-source voice enabled conversational system allowing for ho
 * **Dataset Creation and Model Updating**: BarkBright can create a dataset based on your interactions with Human-In-The-Loop feedback. This can be used to update or retrain the model completly on commonly used phrases!
 
 ## Getting Started
-
+https://github.com/rpi-ws281x/rpi-ws281x-python/tree/master/library#spi
 * Clone the repo:
     ```
     git clone https://github.com/robinonsay/BarkBright.git

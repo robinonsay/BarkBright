@@ -18,7 +18,7 @@ import pyaudio
 import numpy as np
 from datetime import datetime
 from barkbright.models.intent import IntentMatchingModel
-from barkbright import Audio, Speaker, Microphone, CHIME_PATH, CHUNK_SIZE, bb_config
+from barkbright import Audio, Speaker, Microphone, CHUNK_SIZE, bb_config
 from barkbright import parsing
 from dataset import BB_INTENTS
 from barkbright.models import asr
@@ -56,17 +56,16 @@ def main(train=False):
             if device_index == -1:
                 print(f"Device '{device_name}' not found")
                 exit()
-        # chime_audio = []
-        # with wave.open(CHIME_PATH.as_posix(), 'rb') as chime:
-        #     chime_config = {'format':audio.get_format_from_width(chime.getsampwidth()),
-        #                     'channels':chime.getnchannels(),
-        #                     'rate':chime.getframerate(),
-        #                     'output':True,
-        #                     'output_device_index': device_index}
-        #     while len(data := chime.readframes(CHUNK_SIZE)):
-        #         chime_audio.append(data)
+        chime_audio = None
+        with wave.open(bb_config['chime_path'], 'rb') as chime:
+            chime_config = {'format':audio.get_format_from_width(chime.getsampwidth()),
+                            'channels':chime.getnchannels(),
+                            'rate':chime.getframerate(),
+                            'output':True,
+                            'output_device_index': device_index}
+            chime_audio =  chime.readframes(chime.getnframes())
         # with Speaker(audio, **chime_config) as speaker, NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
-        with NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
+        with NeoPixelLEDStrip(**bb_config['led_config']) as np_leds, Speaker(audio, **chime_config) as speaker:
             for phrase in asr.listen():
                 if not (phrase == '' or phrase is None):
                     sub_phrases = parsing.split_on_conj(phrase)
@@ -74,9 +73,8 @@ def main(train=False):
                     for i, p in enumerate(sub_phrases):
                         intent_str = intent[i,0]
                         print(f"Intent: {intent_str}\n\tConfidence: {intent[i,1]}\t Log Confidence: {10*np.log10(intent[i,1])}]")
-                        # if intent_str != 'unknown':
-                            # for frame in chime_audio:
-                            #     speaker.write(frame)
+                        if intent_str != 'unknown':
+                            speaker.write(chime_audio)
                         if intent_str == 'on':
                             np_leds[:] = COLOR_MAP['white']
                         elif intent_str == 'off':

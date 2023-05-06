@@ -21,11 +21,16 @@ CHUNK_SIZE = 4096
 IN_RATE = 44100
 OUT_RATE = 44100
 CONFIG_PATH = Path(__file__).parent / Path('../config.json')
-MODEL_PATH = Path(__file__).parent / Path('models/assets/vosk-model-small-en-us-0.15')
-CHIME_PATH = Path(__file__).parent / Path('../sounds/chime2.wav')
+DEFAULT_PATH = Path(__file__).parent / Path('../default.json')
+
+with open(DEFAULT_PATH, 'r') as f:
+    bb_config = json.load(f)
 
 with open(CONFIG_PATH, 'r') as f:
-    bb_config = json.load(f)
+    user_config = json.load(f)
+    for key in bb_config.keys():
+        if key in user_config:
+            bb_config[key] = user_config[key]
 
 class Audio:
 

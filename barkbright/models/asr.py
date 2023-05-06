@@ -20,7 +20,7 @@ from vosk import Model, KaldiRecognizer
 from pathlib import Path
 from scipy import signal
 import numpy as np
-from barkbright import Audio, Microphone, bb_config, MODEL_PATH, CHUNK_SIZE, IN_RATE
+from barkbright import Audio, Microphone, bb_config, CHUNK_SIZE, IN_RATE
 from multiprocessing import Process, Pipe
 from multiprocessing.connection import Connection
 
@@ -28,7 +28,7 @@ MODEL_RATE = 16000
 MAX_INT16 = (2**15 - 1)
 
 def listen(model_path=None) -> str:
-    model = model_path if model_path else Model(model_path=MODEL_PATH.as_posix())
+    model = model_path if model_path else Model(model_path=bb_config['vosk_model_path'])
     recognizer = KaldiRecognizer(model, MODEL_RATE)
     recognizer.SetWords(True)
     recognizer.SetPartialWords(True)

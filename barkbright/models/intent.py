@@ -19,7 +19,7 @@ import pandas as pd
 import pickle
 from pathlib import Path
 from barkbright.models import Model, random_state
-from barkbright import colors, modes
+from barkbright import colors, modes, bb_config
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.model_selection import train_test_split
@@ -30,7 +30,7 @@ from dataset import bb_data_path, bb_data, BB_INTENTS
 from xgboost import XGBClassifier
 from typing import Tuple
 
-asset_path = Path(__file__).parent / Path('assets/intent_model')
+asset_path = Path(bb_config['intent_model_path'])
 
 class IntentMatchingModel(Model):
 

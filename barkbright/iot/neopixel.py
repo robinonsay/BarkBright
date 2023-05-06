@@ -24,7 +24,7 @@ class NeoPixelLEDStrip:
                                            self._kwargs["dma"],
                                            self._kwargs["invert"],
                                            self._kwargs["brightness"],
-                                           self._kwargs["channel": 0])
+                                           self._kwargs["channel"])
             self._pixel_strip.begin()
         return self
 

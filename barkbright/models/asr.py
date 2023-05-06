@@ -16,6 +16,8 @@ limitations under the License.
 import wave
 import pyaudio
 import json
+import vosk
+import time
 from vosk import Model, KaldiRecognizer
 from pathlib import Path
 from scipy import signal
@@ -26,6 +28,7 @@ from multiprocessing.connection import Connection
 
 MODEL_RATE = 16000
 MAX_INT16 = (2**15 - 1)
+vosk.SetLogLevel(-1)
 
 def listen(model_path=None) -> str:
     model = model_path if model_path else Model(model_path=bb_config['vosk_model_path'])
@@ -35,6 +38,10 @@ def listen(model_path=None) -> str:
     parent_conn, child_conn = Pipe()
     prcs = Process(target=process_audio, args=(child_conn,))
     prcs.start()
+    wake_word = False
+    sleep_word = False
+    start = None
+    print("Running...")
     try:
         while True:
             audio = b''
@@ -45,14 +52,31 @@ def listen(model_path=None) -> str:
             np_audio_float = signal.resample_poly(np_audio_float, MODEL_RATE, IN_RATE)
             np_audio = (np_audio_float * MAX_INT16).astype(np.int16)
             audio = np_audio.tobytes()
+            if wake_word:
+                start = time.time_ns()
             if recognizer.AcceptWaveform(audio):
-                result = json.loads(recognizer.Result())['text'].split()
-                print(result)
-                if result and bb_config['wakeword'] == result[0]:
-                    print('AWAKE')
-                    result.pop(0)
-                    phrase = ' '.join(result)
-                    yield phrase
+                phrase = str(json.loads(recognizer.Result())['text'])
+                wake_word = bb_config['wakeword'] in phrase or wake_word
+                sleep_word = bb_config['sleep_word'] in phrase or sleep_word
+                if phrase and wake_word:
+                    if sleep_word:
+                        index = phrase.find(bb_config['sleep_word'])
+                        phrase = phrase[:index]
+                        print(phrase)
+                        yield phrase
+                        wake_word = False
+                    else:
+                        index = phrase.find(bb_config['wakeword'])
+                        phrase = phrase[:index] + phrase[index+len(bb_config['wakeword']):]
+                        phrase = 'wakeword' if phrase == '' else phrase
+                        print(phrase)
+                        yield phrase
+            else:
+                partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
+                wake_word = bb_config['wakeword'] in partial_result or wake_word
+                sleep_word = bb_config['sleep_word'] in partial_result or sleep_word
+
+
     finally:
         parent_conn.send(False)
 

@@ -1,0 +1,60 @@
+{
+    "wakeword":
+    {
+        "none": ["How can I help you?", "What can I do for you?"]
+    },
+    "on":
+    {
+        "unknown": ["Turning on the lights."]
+    },
+    "off":
+    {
+        "unknown": ["Turning off the lights."]
+        
+    },
+    "color":
+    {
+        "unknown": ["Changing the color"]
+    },
+    "unknown":
+    {
+        "unknown": 
+        [
+            "Sorry, I'm having trouble understanding. Let's talk later!",
+            "I don't understand. I'll go to sleep."
+        ],
+        "none":
+        [
+            "I didn't quite get that.",
+            "Sorry, could you say that again?"
+        ],
+        "on":
+        [
+            "I didn't quite get that.",
+            "Sorry, could you say that again?"
+        ],
+        "off":
+        [
+            "I didn't quite get that.",
+            "Sorry, could you say that again?"
+        ],
+        "color":
+        [
+            "I didn't quite get that.",
+            "Sorry, could you say that again?"
+        ],
+        "check_in":
+        [
+            "I didn't quite get that.",
+            "Sorry, could you say that again?"
+        ]
+    },
+    "check_in":
+    {
+        "none": ["You still there?"]
+    },
+    "sleep":
+    {
+        "check_in": ["We'll talk later."]
+    }
+}

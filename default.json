@@ -1,5 +1,6 @@
 {
-    "wakeword": "snoopy",
+    "wakeword": "hey snoopy",
+    "sleep_word": "thank you",
     "device": "rpi",
     "vosk_model_path": "barkbright/models/assets/vosk-model-small-en-us-0.15",
     "intent_model_path": "barkbright/models/assets/intent_model",
@@ -13,5 +14,15 @@
         "brightness": 255,
         "invert": false,
         "channel": 0
+    },
+    "espeak_config":
+    {
+        "speed": 200,
+        "pitch": 50,
+        "voice": "en+f1"
+    },
+    "dialogue_editor_config":
+    {
+        "dialogue_path": "dialogue.json"
     }
 }

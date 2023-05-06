@@ -15,14 +15,14 @@ Copyright 2023 Robin Onsay
 '''
 
 import argparse
-from barkbright import cli
-from barkbright import demo
+from barkbright import cli, demo
 
 
 parser = argparse.ArgumentParser(prog='BarkBright',
                                  description='Voice Enabled LED Light Control')
 parser.add_argument('-c', '--cli', action='store_true')
 parser.add_argument('-t', '--train', action='store_true')
+parser.add_argument('-d', '--dialogue_editor', action='store_true')
 
 args = parser.parse_args()
 
@@ -30,6 +30,12 @@ if args.cli:
     cli.main(train=args.train)
 elif args.train:
     cli.train()
+elif args.dialogue_editor:
+    import dearpygui.dearpygui as dpg
+    from barkbright.dialogue import dialogue_editor
+    dpg.create_context()
+    dialogue_editor.main()
+    dpg.destroy_context()
 else:
     demo.main()
 

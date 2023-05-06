@@ -5,25 +5,33 @@
     },
     "on":
     {
-        "unknown": ["Turning on the lights."]
+        "unknown": ["Turning on the lights."],
+        "wakeword": ["Turning on the lights."]
     },
     "off":
     {
-        "unknown": ["Turning off the lights."]
+        "unknown": ["Turning off the lights."],
+        "wakeword": ["Turning off the lights."]
         
     },
     "color":
     {
-        "unknown": ["Changing the color"]
+        "unknown": ["Changing the color"],
+        "wakeword": ["Changing the color"]
     },
     "unknown":
     {
         "unknown": 
         [
-            "Sorry, I'm having trouble understanding. Let's talk later!",
-            "I don't understand. I'll go to sleep."
+            "I didn't quite get that.",
+            "Sorry, could you say that again?"
         ],
         "none":
+        [
+            "I didn't quite get that.",
+            "Sorry, could you say that again?"
+        ],
+        "wakeword":
         [
             "I didn't quite get that.",
             "Sorry, could you say that again?"

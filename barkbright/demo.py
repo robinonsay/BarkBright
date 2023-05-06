@@ -78,11 +78,11 @@ def main(train=False):
                             # for frame in chime_audio:
                             #     speaker.write(frame)
                         if intent_str == 'on':
-                            np_leds.set_color((len(np_leds),), COLOR_MAP['white'])
+                            np_leds[:] = COLOR_MAP['white']
                         elif intent_str == 'off':
-                            np_leds.set_color((len(np_leds),), COLOR_MAP['black'])
+                            np_leds[:] = COLOR_MAP['black']
                         elif intent_str == 'color':
                             words = p.split()
                             for word in words:
                                 if word in COLOR_MAP:
-                                    np_leds.set_color((len(np_leds),), COLOR_MAP[word])
+                                    np_leds[:] = COLOR_MAP[word]

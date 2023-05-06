@@ -15,6 +15,7 @@ class NeoPixelLEDStrip:
     def __init__(self, **kwargs):
         self._kwargs = kwargs
         self._pixel_strip = None
+        self._current_strip = [0 for i in range(self._kwargs['count'])]
     
     def __enter__(self):
         if IS_RPI:
@@ -42,3 +43,17 @@ class NeoPixelLEDStrip:
             for i in range(*indicies):
                 self._pixel_strip.setPixelColor(i, Color(*color))
             self._pixel_strip.show()
+    
+    def __setitem__(self, index, value):
+        if IS_RPI:
+            if isinstance(index, slice):
+                for i in range(*index.indices(len(self.items))):
+                    self._pixel_strip.setPixelColor(i, Color(*value))
+                    self._current_strip[i] = value
+            else:
+                self._pixel_strip.setPixelColor(index, Color(*value))
+                self._current_strip[index] = value
+            self._pixel_strip.show()
+    
+    def __getitem__(self, index):
+        return self._current_strip[index]

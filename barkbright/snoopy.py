@@ -110,14 +110,16 @@ def color_change(np_leds:NeoPixelLEDStrip, phrase):
 
 def increase_brightness(np_leds:NeoPixelLEDStrip, phrase):
     for i, led in enumerate(np_leds):
-        val = (min(255, v+10) for v in led)
-        np_leds[i] = val
+        val = (min(255, v+20) for v in led)
+        if len(val) == 3:
+            np_leds[i] = val
     np_leds.show()
 
 def decrease_brightness(np_leds:NeoPixelLEDStrip, phrase):
     for i, led in enumerate(np_leds):
-        val = (max(0, v-10) for v in led)
-        np_leds[i] = val
+        val = (max(0, v-20) for v in led)
+        if len(val) == 3:
+            np_leds[i] = val
     np_leds.show()
 
 

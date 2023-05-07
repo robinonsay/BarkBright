@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "BarkBright Dialogue Editor",
+            "type": "python",
+            "request": "launch",
+            "module": "barkbright",
+            "justMyCode": true,
+            "args": [
+                "-d"
+            ]
+        },
+        {
             "name": "BarkBright Demo",
             "type": "python",
             "request": "launch",

@@ -1,68 +1,107 @@
 {
-    "wakeword":
-    {
-        "none": ["How can I help you?", "What can I do for you?"]
-    },
-    "on":
-    {
-        "unknown": ["Turning on the lights."],
-        "wakeword": ["Turning on the lights."]
-    },
-    "off":
-    {
-        "unknown": ["Turning off the lights."],
-        "wakeword": ["Turning off the lights."]
-        
-    },
-    "color":
-    {
-        "unknown": ["Changing the color"],
-        "wakeword": ["Changing the color"]
-    },
-    "unknown":
-    {
-        "unknown": 
-        [
-            "I didn't quite get that.",
-            "Sorry, could you say that again?"
-        ],
-        "none":
-        [
-            "I didn't quite get that.",
-            "Sorry, could you say that again?"
-        ],
-        "wakeword":
-        [
-            "I didn't quite get that.",
-            "Sorry, could you say that again?"
-        ],
-        "on":
-        [
-            "I didn't quite get that.",
-            "Sorry, could you say that again?"
-        ],
-        "off":
-        [
-            "I didn't quite get that.",
-            "Sorry, could you say that again?"
-        ],
-        "color":
-        [
-            "I didn't quite get that.",
-            "Sorry, could you say that again?"
-        ],
-        "check_in":
-        [
-            "I didn't quite get that.",
-            "Sorry, could you say that again?"
+    "0": {
+        "intent": null,
+        "dialogue": "Hi, how can I help you?\nGood day, what can I do for you?\nHello, what would you like to do?\n",
+        "children": {
+            "1": null,
+            "2": null,
+            "3": null,
+            "4": null,
+            "8": null,
+            "6": null,
+            "7": null
+        },
+        "coords": [
+            122,
+            314
         ]
     },
-    "check_in":
-    {
-        "none": ["You still there?"]
+    "1": {
+        "intent": "on",
+        "dialogue": "Turning on the lights.\nOk, I'll turn on the lights.\nLights on.\n",
+        "children": {
+            "2": null
+        },
+        "coords": [
+            817,
+            -40
+        ]
     },
-    "sleep":
-    {
-        "check_in": ["We'll talk later."]
+    "2": {
+        "intent": "unknown",
+        "dialogue": "Sorry, I didn't quite understand.\nCould you say that again?",
+        "children": {
+            "5": null
+        },
+        "coords": [
+            1170,
+            350
+        ]
+    },
+    "3": {
+        "intent": "off",
+        "dialogue": "Turning off the lights.\nOk, I'll turn off the lights.\nLights off.\n",
+        "children": {
+            "2": null
+        },
+        "coords": [
+            821,
+            159
+        ]
+    },
+    "4": {
+        "intent": "color",
+        "dialogue": "Changing the color.\nSetting the color.\nI'll set the color.\nPretty, good choice.",
+        "children": {
+            "2": null
+        },
+        "coords": [
+            820,
+            349
+        ]
+    },
+    "5": {
+        "intent": "unknown",
+        "dialogue": "Try rephrasing that please.\nCould you say that another way?\n",
+        "children": {
+            "2": null
+        },
+        "coords": [
+            1549,
+            355
+        ]
+    },
+    "6": {
+        "intent": "increase",
+        "dialogue": "I'll make it brighter for you.\nLet's brighten up the place.\nIncreasing brightness.",
+        "children": {
+            "2": null
+        },
+        "coords": [
+            823,
+            549
+        ]
+    },
+    "7": {
+        "intent": "decrease",
+        "dialogue": "I'll make it dimmer for you.\nDecreasing brightness.\nI'll take it down a notch",
+        "children": {
+            "2": null
+        },
+        "coords": [
+            822,
+            740
+        ]
+    },
+    "8": {
+        "intent": "mode",
+        "dialogue": "Changing the vibes.\nVibe change coming up!",
+        "children": {
+            "2": null
+        },
+        "coords": [
+            825,
+            929
+        ]
     }
 }

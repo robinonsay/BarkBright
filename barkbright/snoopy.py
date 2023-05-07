@@ -49,13 +49,13 @@ def main():
         with NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
             transition = 'root'
             reset = True
-            for phrase in asr.listen(parent_mic_conn):
+            for phrase, is_done in asr.listen(parent_mic_conn):
                 if phrase is None:
                     continue
-                if phrase == '':
+                if len(phrase) == 0 and not is_done:
                     transition = 'root'
                     reset = False
-                elif phrase == 'thank you':
+                elif len(phrase) == 0 and is_done:
                     transition = 'sleep'
                     reset = True
                 else:
@@ -91,6 +91,12 @@ def main():
                 num_phrases = len(dlg.dialogue[str(transition)]['dialogue'].splitlines())
                 parent_speaker_conn.send(f"{transition}_{random.randint(0, num_phrases - 1)}.wav")
                 is_speaking.value = False
+                if len(phrase) > 0 and is_done:
+                    is_speaking.value = True
+                    num_phrases = len(dlg.dialogue["sleep"]['dialogue'].splitlines())
+                    parent_speaker_conn.send(f"sleep_{random.randint(0, num_phrases - 1)}.wav")
+                    is_speaking.value = False
+
     finally:
         running.value = False
 

@@ -50,17 +50,18 @@ def listen(parent_conn):
             wake_word = bb_config['wakeword'] in phrase or wake_word
             sleep_word = bb_config['sleep_word'] in phrase or sleep_word
             if phrase and wake_word:
+                index = phrase.find(bb_config['wakeword'])
+                if index != -1:
+                    phrase = phrase[:index] + phrase[index+len(bb_config['wakeword']):]
                 if sleep_word:
                     index = phrase.find(bb_config['sleep_word'])
                     if index != -1:
-                        phrase = phrase[:index] + bb_config['sleep_word']
+                        phrase = phrase[:index]
                     wake_word = False
+                    yield phrase, sleep_word
                     sleep_word = False
                 else:
-                    index = phrase.find(bb_config['wakeword'])
-                    if index != -1:
-                        phrase = phrase[:index] + phrase[index+len(bb_config['wakeword']):]
-                yield phrase
+                    yield phrase, sleep_word
         else:
             partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
             wake_word = bb_config['wakeword'] in partial_result or wake_word

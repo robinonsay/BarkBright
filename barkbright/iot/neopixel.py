@@ -58,8 +58,7 @@ class NeoPixelLEDStrip:
     
     def __iter__(self):
         if IS_RPI:
-            for i in range(len(self)):
-                yield self._current_strip[i]
+            return self._current_strip.__iter__()
 
     def show(self):
         if IS_RPI:

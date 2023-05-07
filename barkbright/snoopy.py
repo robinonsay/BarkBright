@@ -48,28 +48,35 @@ def main():
     try:
         with NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
             transition = 'root'
+            reset = True
             for phrase in asr.listen(parent_mic_conn):
                 if phrase is None:
                     continue
                 if phrase == '':
                     transition = 'root'
+                    reset = False
                 elif phrase == 'thank you':
                     transition = 'sleep'
+                    reset = True
                 else:
                     sub_phrases = parsing.split_on_conj(phrase)
                     intent = intent_model.predict(sub_phrases)
                     for i, p in enumerate(sub_phrases):
                         intent_str = intent[i,0]
-                        transition_map = dlg.dialogue[str(transition)]['transition']
-                        if intent_str in transition_map:
-                            transition = transition_map[intent_str]
+                        if reset and intent_str == 'unknown':
+                            transition = 'root'
+                            reset = False
                         else:
-                            while 'hub' in transition_map:
-                                transition = transition_map['hub']
-                                transition_map = dlg.dialogue[str(transition)]['transition']
-                                if intent_str in transition_map:
-                                    transition = transition_map[intent_str]
-                                    break
+                            transition_map = dlg.dialogue[str(transition)]['transition']
+                            if intent_str in transition_map:
+                                transition = transition_map[intent_str]
+                            else:
+                                while 'hub' in transition_map:
+                                    transition = transition_map['hub']
+                                    transition_map = dlg.dialogue[str(transition)]['transition']
+                                    if intent_str in transition_map:
+                                        transition = transition_map[intent_str]
+                                        break
                         if intent_str == 'on':
                             on(np_leds)
                         elif intent_str == 'off':

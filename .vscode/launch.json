@@ -15,7 +15,7 @@
             ]
         },
         {
-            "name": "BarkBright Demo",
+            "name": "BarkBright",
             "type": "python",
             "request": "launch",
             "module": "barkbright",

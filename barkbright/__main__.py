@@ -15,7 +15,7 @@ Copyright 2023 Robin Onsay
 '''
 
 import argparse
-from barkbright import cli, demo
+from barkbright import cli, demo, snoopy
 
 
 parser = argparse.ArgumentParser(prog='BarkBright',
@@ -23,6 +23,7 @@ parser = argparse.ArgumentParser(prog='BarkBright',
 parser.add_argument('-c', '--cli', action='store_true')
 parser.add_argument('-t', '--train', action='store_true')
 parser.add_argument('-d', '--dialogue_editor', action='store_true')
+parser.add_argument('--demo', action='store_true')
 
 args = parser.parse_args()
 
@@ -36,6 +37,8 @@ elif args.dialogue_editor:
     dpg.create_context()
     dialogue_editor.main()
     dpg.destroy_context()
-else:
+elif args.demo:
     demo.main()
+else:
+    snoopy.main()
 

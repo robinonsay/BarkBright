@@ -21,18 +21,17 @@ import argparse
 
 parser = argparse.ArgumentParser(prog='BarkBright',
                                  description='Voice Enabled LED Light Control')
-parser.add_argument('-g', '--generate', action='store_true')
-
-OUT_PATH = Path(__file__).parent / Path('sounds')
+parser.add_argument('-p', '--path', nargs=1)
 args = parser.parse_args()
-if args.generate:
-    dialogue.load_dialogue()
-    tts_engine = TTS(model_name='tts_models/en/vctk/vits')
-    for key, node in dialogue.dialogue.items():
-        for intent, phrases in node.items():
-            for i, phrase in enumerate(phrases):
-                tts_engine.tts_to_file(text=phrase,
-                                    speaker='p255',
-                                    file_path=str(OUT_PATH / f"{key}_{intent}_{i}.wav"))
+
+if args.path:
+    OUT_PATH = args.path
 else:
-    parser.error("Pass -g to generate")
+    OUT_PATH = Path(__file__).parent / Path('sounds')
+dialogue.load_dialogue()
+tts_engine = TTS(model_name='tts_models/en/vctk/vits')
+for node, value in dialogue.dialogue.items():
+    for i, phrase in enumerate(value['dialogue'].splitlines()):
+        tts_engine.tts_to_file(text=phrase,
+                            speaker='p255',
+                            file_path=str(OUT_PATH / f"{node}_{i}.wav"))

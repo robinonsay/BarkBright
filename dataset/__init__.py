@@ -29,5 +29,6 @@ BB_INTENTS = (
     'decrease',
     'color',
     'mode',
-    'unknown'
+    'unknown',
+    'sleep'
 )

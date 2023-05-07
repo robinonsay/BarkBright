@@ -31,7 +31,6 @@ from multiprocessing.connection import Connection
 
 def main(train=False):
     dialogue.load_dialogue()
-    global SAMP_WIDTH
     intent_model = IntentMatchingModel()
     if train:
         print('Training...')

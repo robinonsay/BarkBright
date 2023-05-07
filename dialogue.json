@@ -1,107 +1,181 @@
 {
-    "0": {
+    "root": {
         "intent": null,
         "dialogue": "Hi, how can I help you?\nGood day, what can I do for you?\nHello, what would you like to do?\n",
         "children": {
-            "1": null,
-            "2": null,
-            "3": null,
-            "4": null,
-            "8": null,
-            "6": null,
-            "7": null
+            "10": "hub"
         },
         "coords": [
             122,
             314
-        ]
+        ],
+        "transition": {
+            "hub": "10"
+        }
     },
     "1": {
         "intent": "on",
         "dialogue": "Turning on the lights.\nOk, I'll turn on the lights.\nLights on.\n",
         "children": {
-            "2": null
+            "11": "hub"
         },
         "coords": [
             817,
             -40
-        ]
+        ],
+        "transition": {
+            "hub": "11"
+        }
     },
     "2": {
         "intent": "unknown",
         "dialogue": "Sorry, I didn't quite understand.\nCould you say that again?",
         "children": {
-            "5": null
+            "11": "hub",
+            "5": "unknown"
         },
         "coords": [
-            1170,
-            350
-        ]
+            825,
+            -247
+        ],
+        "transition": {
+            "hub": "11",
+            "unknown": "5"
+        }
     },
     "3": {
         "intent": "off",
         "dialogue": "Turning off the lights.\nOk, I'll turn off the lights.\nLights off.\n",
         "children": {
-            "2": null
+            "11": "hub"
         },
         "coords": [
             821,
             159
-        ]
+        ],
+        "transition": {
+            "hub": "11"
+        }
     },
     "4": {
         "intent": "color",
         "dialogue": "Changing the color.\nSetting the color.\nI'll set the color.\nPretty, good choice.",
         "children": {
-            "2": null
+            "11": "hub"
         },
         "coords": [
             820,
             349
-        ]
+        ],
+        "transition": {
+            "hub": "11"
+        }
     },
     "5": {
         "intent": "unknown",
         "dialogue": "Try rephrasing that please.\nCould you say that another way?\n",
         "children": {
-            "2": null
+            "11": "hub"
         },
         "coords": [
-            1549,
-            355
-        ]
+            1228,
+            -196
+        ],
+        "transition": {
+            "hub": "11"
+        }
     },
     "6": {
         "intent": "increase",
         "dialogue": "I'll make it brighter for you.\nLet's brighten up the place.\nIncreasing brightness.",
         "children": {
-            "2": null
+            "11": "hub"
         },
         "coords": [
             823,
             549
-        ]
+        ],
+        "transition": {
+            "hub": "11"
+        }
     },
     "7": {
         "intent": "decrease",
         "dialogue": "I'll make it dimmer for you.\nDecreasing brightness.\nI'll take it down a notch",
         "children": {
-            "2": null
+            "11": "hub"
         },
         "coords": [
             822,
             740
-        ]
+        ],
+        "transition": {
+            "hub": "11"
+        }
     },
     "8": {
         "intent": "mode",
         "dialogue": "Changing the vibes.\nVibe change coming up!",
         "children": {
-            "2": null
+            "11": "hub"
         },
         "coords": [
             825,
             929
+        ],
+        "transition": {
+            "hub": "11"
+        }
+    },
+    "sleep": {
+        "intent": "sleep",
+        "dialogue": "Good bye!\nWe'll talk later.",
+        "children": {},
+        "coords": [
+            1515,
+            367
+        ]
+    },
+    "10": {
+        "intent": "hub",
+        "dialogue": "",
+        "children": {
+            "4": "color",
+            "3": "off",
+            "1": "on",
+            "2": "unknown",
+            "6": "increase",
+            "7": "decrease",
+            "8": "mode"
+        },
+        "transition": {
+            "color": "4",
+            "off": "3",
+            "on": "1",
+            "unknown": "2",
+            "increase": "6",
+            "decrease": "7",
+            "mode": "8"
+        },
+        "coords": [
+            486,
+            355
+        ]
+    },
+    "11": {
+        "intent": "hub",
+        "dialogue": "",
+        "children": {
+            "sleep": "sleep",
+            "10": "hub"
+        },
+        "transition": {
+            "sleep": "sleep",
+            "hub": "10"
+        },
+        "coords": [
+            1214,
+            377
         ]
     }
 }

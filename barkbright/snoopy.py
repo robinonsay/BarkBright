@@ -175,7 +175,7 @@ def microphone(conn:Connection, is_speaking:Value, run:Value):
             'input_device_index': device_index
         }
         with Microphone(audio, **config) as mic:
-            print('Listening...')
+            print('Snooopy Listening...')
             record = True
             while run.value:
                 if record and not is_speaking.value:

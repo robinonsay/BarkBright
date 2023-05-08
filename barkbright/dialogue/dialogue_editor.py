@@ -82,7 +82,7 @@ def _add_node_callback(sender, app_data):
         out_attr = dpg.generate_uuid()
         hub_attr = dpg.generate_uuid()
         with dpg.node_attribute(label='in') as in_attr:
-            intent_str = dpg.add_combo(items=BB_INTENTS + ('hub',),
+            intent_str = dpg.add_combo(items=bb_config['intents'] + ('hub',),
                                        label="Intent",
                                        width=100,
                                        callback=__set_hub,
@@ -137,7 +137,7 @@ def main():
                         out_attr = dpg.generate_uuid()
                         hub_attr = dpg.generate_uuid()
                         with dpg.node_attribute(label='in') as in_attr:
-                            intent_id = dpg.add_combo(items=BB_INTENTS + ('hub',),
+                            intent_id = dpg.add_combo(items=bb_config['intents'] + ('hub',),
                                                         label="Intent",
                                                         width=100,
                                                         default_value=value['intent'],

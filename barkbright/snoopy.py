@@ -24,7 +24,7 @@ from pathlib import Path
 from datetime import datetime
 from barkbright.models.intent import IntentMatchingModel
 from barkbright import Audio, Speaker, Microphone, CHUNK_SIZE, bb_config, IN_RATE
-from barkbright import parsing
+from barkbright import parsing, colors, modes
 from barkbright.word2num import word2num
 import barkbright.dialogue as dlg
 from dataset import BB_INTENTS
@@ -63,7 +63,7 @@ def main():
                     reset = True
                 else:
                     sub_phrases = parsing.split_on_conj(phrase)
-                    intent = intent_model.predict(sub_phrases)
+                    intent = intent_model.predict(_preprocess(sub_phrases))
                     for i, p in enumerate(sub_phrases):
                         intent_str = intent[i,0]
                         if reset and intent_str == 'unknown':
@@ -202,4 +202,13 @@ def microphone(conn:Connection, is_speaking:Value, run:Value):
                 elif not is_speaking.value:
                     mic.start_stream()
                     record = True
+
+def _preprocess(self, phrase):
+    phrase = phrase.lower()
+    phrase = re.sub(r'\d+', '<number>', phrase)
+    for color in colors.COLOR_MAP.keys():
+        phrase = phrase.replace(color, '<color>')
+    for mode in modes.KNOWN_MODES:
+        phrase = phrase.replace(mode, '<mode>')
+    return phrase
 

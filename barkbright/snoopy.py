@@ -66,6 +66,7 @@ def main():
                     intent = intent_model.predict(_preprocess(sub_phrases))
                     for i, p in enumerate(sub_phrases):
                         intent_str = intent[i,0]
+                        print(intent_str)
                         if reset and intent_str == 'unknown':
                             transition = 'root'
                             reset = False

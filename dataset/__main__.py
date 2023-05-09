@@ -75,7 +75,7 @@ _prephrase = KeyWord('prephrase', [
     'please',
 ])
 
-_postphrase = KeyWord('posephrase', [
+_postphrase = KeyWord('postphrase', [
     'please',
     'thank you'
 ])
@@ -114,6 +114,7 @@ keyword_re = r'<\w+>'
 used_phrases = {data['phrase'] for data in bb_data}
 
 for intent in BB_INTENTS:
+    print(intent)
     for seed in seed_data[intent]:
         queue = [seed]
         phrases = list()

@@ -34,4 +34,4 @@ COLOR_MAP = {
     "teal": (0, 128, 128),
     "navy": (0, 0, 128)
 }
-KNOWN_COLORS = {color.lower() for color in COLOR_MAP.keys()}
+KNOWN_COLORS = [color.lower() for color in COLOR_MAP.keys()]

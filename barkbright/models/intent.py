@@ -160,7 +160,7 @@ class IntentMatchingModel(Model):
     def _preprocess(self, df:pd.DataFrame):
         df['phrase'] = df['phrase'].str.lower()
         df['phrase'] = df['phrase'].str.replace(r'\d+', '<number>', regex=True)
-        for color in colors.KNOWN_COLORS:
+        for color in colors.COLOR_MAP.keys():
             df['phrase'] = df['phrase'].str.replace(color, '<color>')
         for mode in modes.KNOWN_MODES:
             df['phrase'] = df['phrase'].str.replace(mode, '<mode>')

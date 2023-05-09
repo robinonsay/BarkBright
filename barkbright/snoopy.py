@@ -17,6 +17,7 @@ Copyright 2023 Robin Onsay
 import wave
 import pyaudio
 import random
+import re
 import numpy as np
 from scipy import signal
 from pathlib import Path
@@ -24,6 +25,7 @@ from datetime import datetime
 from barkbright.models.intent import IntentMatchingModel
 from barkbright import Audio, Speaker, Microphone, CHUNK_SIZE, bb_config, IN_RATE
 from barkbright import parsing
+from barkbright.word2num import word2num
 import barkbright.dialogue as dlg
 from dataset import BB_INTENTS
 from barkbright.models import asr
@@ -50,6 +52,7 @@ def main():
             transition = 'root'
             reset = True
             for phrase, is_done in asr.listen(parent_mic_conn):
+                phrase = word2num(phrase)
                 if phrase is None:
                     continue
                 if len(phrase) == 0 and not is_done:
@@ -115,14 +118,26 @@ def color_change(np_leds:NeoPixelLEDStrip, phrase):
     np_leds.show()
 
 def increase_brightness(np_leds:NeoPixelLEDStrip, phrase):
+    amount = re.findall(r'\d+', phrase)
+    if amount:
+        amount = int(amount[0]) / 100
+    else:
+        amount = 0.2
+    step = amount * 255
     for i, led in enumerate(np_leds):
-        val = tuple([min(255, v+20) for v in led])
+        val = tuple([min(255, v+step) for v in led])
         np_leds[i] = val
     np_leds.show()
 
 def decrease_brightness(np_leds:NeoPixelLEDStrip, phrase):
+    amount = re.findall(r'\d+', phrase)
+    if amount:
+        amount = int(amount[0]) / 100
+    else:
+        amount = 0.2
+    step = amount * 255
     for i, led in enumerate(np_leds):
-        val = tuple([max(0, v-20) for v in led])
+        val = tuple([min(255, v-step) for v in led])
         np_leds[i] = val
     np_leds.show()
 

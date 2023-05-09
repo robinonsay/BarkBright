@@ -203,7 +203,7 @@ def microphone(conn:Connection, is_speaking:Value, run:Value):
                     mic.start_stream()
                     record = True
 
-def _preprocess(self, phrase):
+def _preprocess(phrase):
     phrase = phrase.lower()
     phrase = re.sub(r'\d+', '<number>', phrase)
     for color in colors.COLOR_MAP.keys():

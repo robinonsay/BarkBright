@@ -125,7 +125,7 @@ def increase_brightness(np_leds:NeoPixelLEDStrip, phrase):
         amount = 0.2
     step = amount * 255
     for i, led in enumerate(np_leds):
-        val = tuple([min(255, v+step) for v in led])
+        val = tuple([min(255, int(v+step)) for v in led])
         np_leds[i] = val
     np_leds.show()
 
@@ -137,7 +137,7 @@ def decrease_brightness(np_leds:NeoPixelLEDStrip, phrase):
         amount = 0.2
     step = amount * 255
     for i, led in enumerate(np_leds):
-        val = tuple([min(255, v-step) for v in led])
+        val = tuple([min(255, int(v-step)) for v in led])
         np_leds[i] = val
     np_leds.show()
 

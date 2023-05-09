@@ -3,6 +3,18 @@ import math
 
 split_re = r'[-\s]'
 
+fractions_map = {
+    'half': 1/2,
+    'third': 1/3,
+    'quarter': 1/4,
+    'fifth': 1/5,
+    'sixth': 1/6,
+    'seventh': 1/7,
+    'eigth': 1/8,
+    'nineth': 1/9,
+    'tenth': 1/10,
+}
+
 ones_map = {
     'zero': 0,
     'one': 1,
@@ -50,7 +62,7 @@ large_map = {
 
 ands_set = {'and', 'an', 'on'}
 
-word_maps = [ones_map, teens_map, tens_map, large_map]
+word_maps = [fractions_map, ones_map, teens_map, tens_map, large_map]
 
 def word2num(phrase:str)->str:
     words = re.split(split_re, phrase)
@@ -68,12 +80,15 @@ def word2num(phrase:str)->str:
                 length += 1
                 is_num = True
                 break
-            is_num = is_num or word in word_map
-            if word in word_map:
+            if word in word_map or word[:-1] in word_map:
+                if word[:-1] in word_map:
+                    word = word[:-1]
+                is_num = True
                 length += 1
                 number_qs[-1].append(word_map[word])
                 if index == 0:
                     index = i
+                break
         if previous_is_num and not is_num:
             indicies.append((index, length))
             number_qs.append(list())
@@ -88,11 +103,14 @@ def word2num(phrase:str)->str:
         temp = 0
         while number_q:
             if number < number_q[-1]:
-                if number != 0 and temp != 0:
-                    digit = math.floor(math.log10(number))
-                    number += (temp - 1) * 10**digit
-                number += number_q.pop()
-                temp = 0
+                if 0 < number < 1:
+                    number *= number_q.pop()
+                else:
+                    if number != 0 and temp != 0:
+                        digit = math.floor(math.log10(number))
+                        number += (temp - 1) * 10**digit
+                    number += number_q.pop()
+                    temp = 0
             else:
                 if temp == 0:
                     temp = number_q.pop()
@@ -105,7 +123,7 @@ def word2num(phrase:str)->str:
         if temp != 0 and temp < number:
             digit = math.floor(math.log10(number))
             number += (temp - 1) * 10**digit
-        out_words += words[last:i] + [str(int(number))]
+        out_words += words[last:i] + [str(number)]
         last = i + length
     out_words += words[last:]
     return ' '.join(out_words)
@@ -113,4 +131,5 @@ def word2num(phrase:str)->str:
 if __name__ == '__main__':
     print(word2num('i have two-hundred and thirty two apples and also I have fifteen percent more than you and also thirteen billion four hundred fifty one million four hundred thousand fifty two is a number'))
     print(word2num('decrease the brightness by fifty'))
-    # print(word2num('also thirteen billion four hundred fifty one million four hundred thousand fifty two is a number'))
+    print(word2num('decrease the brightness by half'))
+    print(word2num('decrease the brightness by two thirds'))

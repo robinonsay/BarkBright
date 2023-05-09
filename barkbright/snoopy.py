@@ -27,13 +27,13 @@ from barkbright.models.intent import IntentMatchingModel
 from barkbright import Audio, Speaker, Microphone, CHUNK_SIZE, bb_config, IN_RATE
 from barkbright import parsing, colors, modes
 from barkbright.word2num import word2num
-import barkbright.dialogue as dlg
-from dataset import BB_INTENTS
+from barkbright import dialogue as dlg
 from barkbright.models import asr
 from barkbright.iot.neopixel import NeoPixelLEDStrip
 from barkbright.colors import COLOR_MAP
 from multiprocessing import Process, Pipe, Value
 from multiprocessing.connection import Connection
+from dataset import BB_INTENTS
 
 def main():
     dlg.load_dialogue()
@@ -121,9 +121,11 @@ def color_change(np_leds:NeoPixelLEDStrip, phrase):
     np_leds.show()
 
 def increase_brightness(np_leds:NeoPixelLEDStrip, phrase):
-    amount = re.findall(r'\d+', phrase)
+    amount = re.findall(r'\d+\.\d+|\d+', phrase)
     if amount:
-        amount = int(amount[0]) / 100
+        amount = float(amount[0])
+        if amount >= 1:
+            amount = amount / 100
     else:
         amount = 0.2
     step = amount * 255
@@ -133,9 +135,11 @@ def increase_brightness(np_leds:NeoPixelLEDStrip, phrase):
     np_leds.show()
 
 def decrease_brightness(np_leds:NeoPixelLEDStrip, phrase):
-    amount = re.findall(r'\d+', phrase)
+    amount = re.findall(r'\d+\.\d+|\d+', phrase)
     if amount:
-        amount = int(amount[0]) / 100
+        amount = float(amount[0])
+        if amount >= 1:
+            amount = amount / 100
     else:
         amount = 0.2
     step = amount * 255
@@ -212,11 +216,12 @@ def _preprocess(phrases):
     new_phrases = []
     for phrase in phrases:
         phrase = phrase.lower()
-        phrase = re.sub(r'\d+', '<number>', phrase)
+        phrase = re.sub(r'\d+\.\d+|\d+', '<number>', phrase)
         for color in colors.COLOR_MAP.keys():
             phrase = phrase.replace(color, '<color>')
         for mode in modes.KNOWN_MODES:
             phrase = phrase.replace(mode, '<mode>')
         new_phrases.append(phrase)
+    print(new_phrases)
     return new_phrases
 

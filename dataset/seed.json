@@ -45,13 +45,19 @@
         "<prephrase> increase brightness <postphrase>",
         "<prephrase> increase brightness by <number> <postphrase>",
         "brighter",
-        "it needs to be brighter"
+        "it needs to be brighter",
+        "make <prep> <light> <number> percent brighter",
+        "make <light> <number> percent brighter",
+        "<prephrase> make <prep> <light> <number> percent brighter"
     ],
     "decrease": [
         "decrease brightness",
         "decrease brightness by <number>",
         "decrease <prep> brightness",
         "decrease <prep> brightness by <number>",
+        "make <prep> <light> <number> percent dimmer",
+        "make <light> <number> percent dimmer",
+        "<prephrase> make <prep> <light> <number> percent dimmer",
         "<prephrase> decrease brightness",
         "<prephrase> decrease brightness by <number>",
         "<prephrase> decrease <prep> brightness",

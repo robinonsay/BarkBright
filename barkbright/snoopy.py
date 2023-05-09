@@ -18,6 +18,7 @@ import wave
 import pyaudio
 import random
 import re
+import time
 import numpy as np
 from scipy import signal
 from pathlib import Path
@@ -40,9 +41,10 @@ def main():
     intent_model.load()
     intent = None
     running = Value('B', True)
+    ready = Value('B', False)
     is_speaking = Value('B', False)
     parent_mic_conn, child_mic_conn = Pipe()
-    prcs = Process(target=microphone, args=(child_mic_conn, is_speaking, running))
+    prcs = Process(target=microphone, args=(child_mic_conn, is_speaking, running, ready))
     prcs.start()
     parent_speaker_conn, child_speaker_conn = Pipe()
     prcs = Process(target=speaker, args=(child_speaker_conn, is_speaking, running))
@@ -51,7 +53,7 @@ def main():
         with NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
             transition = 'root'
             reset = True
-            for phrase, is_done in asr.listen(parent_mic_conn):
+            for phrase, is_done in asr.listen(parent_mic_conn, ready):
                 phrase = word2num(phrase)
                 if phrase is None:
                     continue
@@ -179,7 +181,7 @@ def speaker(conn:Connection, is_speaking:Value, run:Value):
                     speaker.write(audio_data)
                 is_speaking.value = False
 
-def microphone(conn:Connection, is_speaking:Value, run:Value):
+def microphone(conn:Connection, is_speaking:Value, run:Value, ready:Value):
     with Audio() as audio:
         device_index = get_audio_device(audio)
         config = {
@@ -190,6 +192,8 @@ def microphone(conn:Connection, is_speaking:Value, run:Value):
             'frames_per_buffer': CHUNK_SIZE,
             'input_device_index': device_index
         }
+        while not ready.value:
+            time.sleep(0.1)
         with Microphone(audio, **config) as mic:
             print('Snooopy Listening...')
             record = True

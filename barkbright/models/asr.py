@@ -27,7 +27,7 @@ MODEL_RATE = 16000
 MAX_INT16 = (2**15 - 1)
 vosk.SetLogLevel(-1)
 
-def listen(parent_conn):
+def listen(parent_conn, ready):
     model = Model(model_path=bb_config['vosk_model_path'])
     recognizer = KaldiRecognizer(model, MODEL_RATE)
     recognizer.SetWords(True)
@@ -38,6 +38,8 @@ def listen(parent_conn):
     print("ASR Running...")
     while True:
         audio = b''
+        if not ready.value:
+            ready.value = True
         while parent_conn.poll():
             audio += parent_conn.recv_bytes()
         np_audio = np.frombuffer(audio, dtype=np.int16)

@@ -203,12 +203,15 @@ def microphone(conn:Connection, is_speaking:Value, run:Value):
                     mic.start_stream()
                     record = True
 
-def _preprocess(phrase):
-    phrase = phrase.lower()
-    phrase = re.sub(r'\d+', '<number>', phrase)
-    for color in colors.COLOR_MAP.keys():
-        phrase = phrase.replace(color, '<color>')
-    for mode in modes.KNOWN_MODES:
-        phrase = phrase.replace(mode, '<mode>')
-    return phrase
+def _preprocess(phrases):
+    new_phrases = []
+    for phrase in phrases:
+        phrase = phrase.lower()
+        phrase = re.sub(r'\d+', '<number>', phrase)
+        for color in colors.COLOR_MAP.keys():
+            phrase = phrase.replace(color, '<color>')
+        for mode in modes.KNOWN_MODES:
+            phrase = phrase.replace(mode, '<mode>')
+        new_phrases.append(phrase)
+    return new_phrases
 

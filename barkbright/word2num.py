@@ -79,6 +79,8 @@ def word2num(phrase:str)->str:
             number_qs.append(list())
             length = 0
             index = 0
+    if is_num:
+        indicies.append((index, length))
     last = 0
     for index, number_q in zip(indicies, number_qs):
         i, length = index
@@ -110,4 +112,5 @@ def word2num(phrase:str)->str:
 
 if __name__ == '__main__':
     print(word2num('i have two-hundred and thirty two apples and also I have fifteen percent more than you and also thirteen billion four hundred fifty one million four hundred thousand fifty two is a number'))
+    print(word2num('decrease the brightness by fifty'))
     # print(word2num('also thirteen billion four hundred fifty one million four hundred thousand fifty two is a number'))

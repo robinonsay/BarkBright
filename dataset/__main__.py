@@ -96,7 +96,7 @@ _light = KeyWord('light', [
     'leds'
 ])
 
-_number = KeyWord('number', [str(random.randint(0,100) for i in range(25))])
+_number = KeyWord('number', ['55'])
 
 _set = KeyWord('set', [
     'set',
@@ -111,7 +111,7 @@ _mode = KeyWord('mode', [random.choice(KNOWN_MODES)])
 keywords = [_on, _off, _prephrase, _postphrase, _prep, _light, _number, _set, _color, _mode]
 keyword_re = r'<\w+>'
 
-used_phrases = {data['phrase'] for data in bb_data}
+# used_phrases = {data['phrase'] for data in bb_data}
 
 for intent in BB_INTENTS:
     print(intent)
@@ -129,12 +129,11 @@ for intent in BB_INTENTS:
             else:
                 phrases.append(phrase)
         for phrase in phrases:
-            if phrase not in used_phrases:
-                bb_data.append({
-                    'intent': intent,
-                    'phrase': phrase
-                })
+            bb_data.append({
+                'intent': intent,
+                'phrase': phrase
+            })
 
 with open(bb_data_path, 'w') as f:
-    json.dump(bb_data, f)
+    json.dump(bb_data, f, indent=4)
     print(f'Dataset Size: {len(bb_data)}')

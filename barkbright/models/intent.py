@@ -144,6 +144,7 @@ class IntentMatchingModel(Model):
     def predict(self, phrases:list, threshold=0.5) -> np.ndarray:
         df = pd.DataFrame(phrases, columns=['phrase'])
         self._preprocess(df)
+        print(df)
         y_pred = self._pipe.predict_proba(df['phrase'])
         pred = y_pred.argmax(axis=1, keepdims=True)
         labels = self._le.inverse_transform(pred.flatten())
@@ -159,7 +160,7 @@ class IntentMatchingModel(Model):
 
     def _preprocess(self, df:pd.DataFrame):
         df['phrase'] = df['phrase'].str.lower()
-        df['phrase'] = df['phrase'].str.replace(r'\d+', '<number>', regex=True)
+        df['phrase'] = df['phrase'].str.replace(r'\d+\.\d+|\d+', '<number>', regex=True)
         for color in colors.COLOR_MAP.keys():
             df['phrase'] = df['phrase'].str.replace(color, '<color>')
         for mode in modes.KNOWN_MODES:

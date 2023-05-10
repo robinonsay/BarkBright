@@ -30,7 +30,7 @@ from barkbright.word2num import word2num
 from barkbright import dialogue as dlg
 from barkbright.models import asr
 from barkbright.iot.neopixel import NeoPixelLEDStrip
-from barkbright.colors import COLOR_MAP
+from barkbright.colors import COLOR_MAP,SNOOPY_COLOR_PALLETE
 from multiprocessing import Process, Pipe, Value
 from multiprocessing.connection import Connection
 from dataset import BB_INTENTS
@@ -59,13 +59,16 @@ def main():
                     continue
                 if len(phrase) == 0 and not is_done:
                     transition = 'root'
+                    np_leds[:len(np_leds) // 2 + 1] = SNOOPY_COLOR_PALLETE['light_blue']
+                    np_leds[len(np_leds) // 2 + 1:] = SNOOPY_COLOR_PALLETE['light_pink']
+                    np_leds.show()
                     reset = False
                 elif len(phrase) == 0 and is_done:
                     transition = 'sleep'
                     reset = True
                 else:
                     sub_phrases = parsing.split_on_conj(phrase)
-                    intent = intent_model.predict(_preprocess(sub_phrases))
+                    intent = intent_model.predict(sub_phrases)
                     for i, p in enumerate(sub_phrases):
                         intent_str = intent[i,0]
                         print(intent_str)
@@ -211,17 +214,3 @@ def microphone(conn:Connection, is_speaking:Value, run:Value, ready:Value):
                 elif not is_speaking.value:
                     mic.start_stream()
                     record = True
-
-def _preprocess(phrases):
-    new_phrases = []
-    for phrase in phrases:
-        phrase = phrase.lower()
-        phrase = re.sub(r'\d+\.\d+|\d+', '<number>', phrase)
-        for color in colors.COLOR_MAP.keys():
-            phrase = phrase.replace(color, '<color>')
-        for mode in modes.KNOWN_MODES:
-            phrase = phrase.replace(mode, '<mode>')
-        new_phrases.append(phrase)
-    print(new_phrases)
-    return new_phrases
-

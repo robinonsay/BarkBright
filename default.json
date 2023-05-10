@@ -8,7 +8,7 @@
     "led_config":
     {
         "gpio": 10,
-        "count": 58,
+        "count": 39,
         "freq_hz": 800000,
         "dma": 10,
         "brightness": 255,

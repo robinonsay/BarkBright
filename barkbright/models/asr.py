@@ -35,7 +35,7 @@ def listen(parent_conn, ready):
     wake_word = False
     sleep_word = False
     start = None
-    print("ASR Running...")
+    # print("ASR Running...")
     while True:
         audio = b''
         if not ready.value:
@@ -51,7 +51,7 @@ def listen(parent_conn, ready):
             phrase = str(json.loads(recognizer.Result())['text'])
             wake_word = bb_config['wakeword'] in phrase or wake_word
             sleep_word = bb_config['sleep_word'] in phrase or sleep_word
-            print(phrase)
+            # print(phrase)
             if phrase and wake_word:
                 index = phrase.find(bb_config['wakeword'])
                 if index != -1:

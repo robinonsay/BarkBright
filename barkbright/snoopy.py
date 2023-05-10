@@ -44,13 +44,18 @@ def main():
     ready = Value('B', False)
     is_speaking = Value('B', False)
     parent_mic_conn, child_mic_conn = Pipe()
-    prcs = Process(target=microphone, args=(child_mic_conn, is_speaking, running, ready))
-    prcs.start()
+    prcs_mic = Process(target=microphone, args=(child_mic_conn, is_speaking, running, ready))
     parent_speaker_conn, child_speaker_conn = Pipe()
-    prcs = Process(target=speaker, args=(child_speaker_conn, is_speaking, running))
-    prcs.start()
+    prcs_spkr = Process(target=speaker, args=(child_speaker_conn, is_speaking, running))
     try:
         with NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
+            np_leds[:] = SNOOPY_COLOR_PALLETE['light_pink']
+            np_leds.show()
+            time.sleep(0.5)
+            np_leds[:] = COLOR_MAP['black']
+            prcs_mic.start()
+            prcs_spkr.start()
+            np_leds.show()
             transition = 'root'
             reset = True
             for phrase, is_done in asr.listen(parent_mic_conn, ready):
@@ -59,9 +64,8 @@ def main():
                     continue
                 if len(phrase) == 0 and not is_done:
                     transition = 'root'
-                    np_leds[:len(np_leds) // 2 + 1] = SNOOPY_COLOR_PALLETE['light_blue']
-                    np_leds.show()
-                    np_leds[len(np_leds) // 2 + 1:-1] = SNOOPY_COLOR_PALLETE['light_pink']
+                    np_leds[:len(np_leds) // 2] = SNOOPY_COLOR_PALLETE['light_blue']
+                    np_leds[len(np_leds) // 2:] = SNOOPY_COLOR_PALLETE['light_pink']
                     np_leds.show()
                     reset = False
                 elif len(phrase) == 0 and is_done:
@@ -72,7 +76,6 @@ def main():
                     intent = intent_model.predict(sub_phrases)
                     for i, p in enumerate(sub_phrases):
                         intent_str = intent[i,0]
-                        print(intent_str)
                         if reset and intent_str == 'unknown':
                             transition = 'root'
                             reset = False
@@ -203,7 +206,7 @@ def microphone(conn:Connection, is_speaking:Value, run:Value, ready:Value):
         while not ready.value:
             time.sleep(0.1)
         with Microphone(audio, **config) as mic:
-            print('Snooopy Listening...')
+            # print('Snooopy Listening...')
             record = True
             while run.value:
                 if record and not is_speaking.value:

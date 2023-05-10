@@ -60,7 +60,8 @@ def main():
                 if len(phrase) == 0 and not is_done:
                     transition = 'root'
                     np_leds[:len(np_leds) // 2 + 1] = SNOOPY_COLOR_PALLETE['light_blue']
-                    np_leds[len(np_leds) // 2 + 1:] = SNOOPY_COLOR_PALLETE['light_pink']
+                    np_leds.show()
+                    np_leds[len(np_leds) // 2 + 1:-1] = SNOOPY_COLOR_PALLETE['light_pink']
                     np_leds.show()
                     reset = False
                 elif len(phrase) == 0 and is_done:

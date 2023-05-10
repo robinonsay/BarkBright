@@ -49,7 +49,7 @@ def main():
     prcs_spkr = Process(target=speaker, args=(child_speaker_conn, is_speaking, running))
     try:
         with NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
-            np_leds[:] = SNOOPY_COLOR_PALLETE['light_pink']
+            np_leds[:] = SNOOPY_COLOR_PALLETE['purple']
             np_leds.show()
             time.sleep(0.5)
             np_leds[:] = COLOR_MAP['black']
@@ -64,8 +64,8 @@ def main():
                     continue
                 if len(phrase) == 0 and not is_done:
                     transition = 'root'
-                    np_leds[:len(np_leds) // 2] = SNOOPY_COLOR_PALLETE['light_blue']
-                    np_leds[len(np_leds) // 2:] = SNOOPY_COLOR_PALLETE['light_pink']
+                    np_leds[:len(np_leds) // 2] = SNOOPY_COLOR_PALLETE['blue']
+                    np_leds[len(np_leds) // 2:] = SNOOPY_COLOR_PALLETE['purple']
                     np_leds.show()
                     reset = False
                 elif len(phrase) == 0 and is_done:

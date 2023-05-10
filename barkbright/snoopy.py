@@ -30,7 +30,7 @@ from barkbright.word2num import word2num
 from barkbright import dialogue as dlg
 from barkbright.models import asr
 from barkbright.iot.neopixel import NeoPixelLEDStrip
-from barkbright.colors import COLOR_MAP,SNOOPY_COLOR_PALLETE
+from barkbright.colors import COLOR_MAP
 from multiprocessing import Process, Pipe, Value
 from multiprocessing.connection import Connection
 from dataset import BB_INTENTS
@@ -49,7 +49,11 @@ def main():
     prcs_spkr = Process(target=speaker, args=(child_speaker_conn, is_speaking, running))
     try:
         with NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
-            np_leds[:] = SNOOPY_COLOR_PALLETE['purple']
+            quarter_len = len(np_leds) // 4
+            np_leds[:quarter_len] = COLOR_MAP['snoopy green']
+            np_leds[quarter_len: quarter_len * 2] = COLOR_MAP['snoopy dark green']
+            np_leds[quarter_len*2:] = COLOR_MAP['snoopy green']
+            np_leds.show()
             np_leds.show()
             time.sleep(0.5)
             np_leds[:] = COLOR_MAP['black']
@@ -64,8 +68,9 @@ def main():
                     continue
                 if len(phrase) == 0 and not is_done:
                     transition = 'root'
-                    np_leds[:len(np_leds) // 2] = SNOOPY_COLOR_PALLETE['blue']
-                    np_leds[len(np_leds) // 2:] = SNOOPY_COLOR_PALLETE['purple']
+                    np_leds[:quarter_len] = COLOR_MAP['snoopy green']
+                    np_leds[quarter_len: quarter_len * 2] = COLOR_MAP['snoopy dark green']
+                    np_leds[quarter_len*2:] = COLOR_MAP['snoopy green']
                     np_leds.show()
                     reset = False
                 elif len(phrase) == 0 and is_done:
@@ -114,7 +119,7 @@ def main():
         running.value = False
 
 def on(np_leds:NeoPixelLEDStrip):
-    np_leds[:] = COLOR_MAP['white']
+    np_leds[:] = COLOR_MAP['warm']
     np_leds.show()
 
 def off(np_leds:NeoPixelLEDStrip):

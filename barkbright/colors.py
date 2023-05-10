@@ -33,15 +33,9 @@ COLOR_MAP = {
     "purple": (128, 0, 128),
     "teal": (0, 128, 128),
     "navy": (0, 0, 128),
-    "warm": (253, 244, 220)
-}
-
-SNOOPY_COLOR_PALLETE = {
-    'purple': (205,108,219),
-    'light_pink': (255,200,221),
-    'pink': (255, 175, 204),
-    'light_blue': (189, 224, 254),
-    'blue': (162, 210, 255),
+    "warm": (253, 244, 220),
+    "snoopy green": (82, 183, 136),
+    "snoopy dark green": (8, 28, 21)
 }
 
 KNOWN_COLORS = [color.lower() for color in COLOR_MAP.keys()]

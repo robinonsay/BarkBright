@@ -41,7 +41,6 @@ def collect_data(parent_conn, ready) -> str:
         np_audio = (np_audio_float * MAX_INT16).astype(np.int16)
         audio = np_audio.tobytes()
         if recognizer.AcceptWaveform(audio):
-            print('')
             phrase = str(json.loads(recognizer.Result())['text'])
             yield phrase
 

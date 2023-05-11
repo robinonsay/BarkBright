@@ -1,19 +1,10 @@
 {
     "wakeword": 
     [
-        "hey fido",
-        "a photo",
-        "hey fighter",
-        "hey if i know",
-        "a fido",
-        "he fido",
-        "a feeder",
-        "a final",
-        "a fighter",
-        "hey find out",
-        "if i know",
-        "if i do"
-
+        "hey bingo",
+        "bingo",
+        "a bingo",
+        "they bingo"
     ],
     "sleep_word": 
     [

@@ -24,13 +24,33 @@ MODEL_RATE = 16000
 MAX_INT16 = (2**15 - 1)
 vosk.SetLogLevel(-1)
 
+def collect_data(parent_conn, ready) -> str:
+    model = Model(model_path=bb_config['vosk_model_path'])
+    recognizer = KaldiRecognizer(model, MODEL_RATE)
+    recognizer.SetWords(True)
+    recognizer.SetPartialWords(True)
+    print('Running...')
+    while True:
+        audio = b''
+        if not ready.value:
+            ready.value = True
+        audio = parent_conn.recv_bytes()
+        np_audio = np.frombuffer(audio, dtype=np.int16)
+        np_audio_float = np_audio.astype(np.float32, order='C') / MAX_INT16
+        np_audio_float = signal.resample_poly(np_audio_float, MODEL_RATE, IN_RATE)
+        np_audio = (np_audio_float * MAX_INT16).astype(np.int16)
+        audio = np_audio.tobytes()
+        if recognizer.AcceptWaveform(audio):
+            phrase = str(json.loads(recognizer.Result())['text'])
+            yield phrase
+
 def listen(parent_conn, ready):
     model = Model(model_path=bb_config['vosk_model_path'])
     recognizer = KaldiRecognizer(model, MODEL_RATE)
     recognizer.SetWords(True)
     recognizer.SetPartialWords(True)
-    wake_word = False
-    sleep_word = False
+    is_wake_word = False
+    is_sleep_word = False
     while True:
         audio = b''
         if not ready.value:
@@ -44,38 +64,44 @@ def listen(parent_conn, ready):
         audio = np_audio.tobytes()
         if recognizer.AcceptWaveform(audio):
             phrase = str(json.loads(recognizer.Result())['text'])
-            wake_word = is_wakeword(phrase) or wake_word
-            sleep_word = is_sleepword(phrase) or sleep_word
-            if phrase and wake_word:
-                index = phrase.find(bb_config['wakeword'])
-                if index != -1:
-                    phrase = phrase[:index] + phrase[index+len(bb_config['wakeword']):]
-                if sleep_word:
-                    index = phrase.find(bb_config['sleep_word'])
+            wakeword = is_wakeword(phrase)
+            sleepword = is_sleepword(phrase)
+            is_wake_word = wakeword or is_wake_word
+            is_sleep_word = sleepword or is_sleep_word
+            if phrase and is_wake_word:
+                if wakeword:
+                    index = phrase.find(wakeword)
                     if index != -1:
-                        phrase = phrase[:index]
-                    wake_word = False
-                    yield phrase, sleep_word
-                    sleep_word = False
+                        phrase = phrase[:index] + phrase[index+len(bb_config['wakeword']):]
+                if is_sleep_word:
+                    if sleepword:
+                        index = phrase.find(sleepword)
+                        if index != -1:
+                            phrase = phrase[:index]
+                    is_wake_word = False
+                    yield phrase, is_sleep_word
+                    is_sleep_word = False
                 else:
-                    yield phrase, sleep_word
-        else:
-            partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
-            wake_word = is_wakeword(partial_result) or wake_word
-            sleep_word = is_sleepword(partial_result) or sleep_word
+                    yield phrase, is_sleep_word
+        # else:
+        #     partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
+        #     wakeword = is_wakeword(partial_result)
+        #     sleepword = is_sleepword(partial_result)
+        #     is_wake_word = wakeword or is_wake_word
+        #     is_sleep_word = sleepword or is_sleep_word
 
 def is_wakeword(phrase:str):
-    is_ww = False
+    ww = None
     for wakeword in bb_config['wakeword']:
         if wakeword in phrase:
-            is_ww = True
+            ww = wakeword
             break
-    return is_ww
+    return ww
 
 def is_sleepword(phrase:str):
-    is_sw = False
+    sw = None
     for sleepword in bb_config['sleep_word']:
         if sleepword in phrase:
-            is_sw = True
+            sw = sleepword
             break
-    return is_sw
+    return sw

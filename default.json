@@ -2,6 +2,7 @@
     "wakeword": "hey snoopy",
     "sleep_word": "thank you",
     "device": "rpi",
+    "audio_device": "USB Audio Device",
     "vosk_model_path": "barkbright/models/assets/vosk-model-small-en-us-0.15",
     "intent_model_path": "barkbright/models/assets/intent_model",
     "chime_path": "sounds/chime2.wav",
@@ -15,12 +16,6 @@
         "brightness": 255,
         "invert": false,
         "channel": 0
-    },
-    "espeak_config":
-    {
-        "speed": 200,
-        "pitch": 50,
-        "voice": "en+f1"
     },
     "dialogue_editor_config":
     {

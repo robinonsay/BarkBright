@@ -7,6 +7,7 @@
     "intent_model_path": "barkbright/models/assets/intent_model",
     "chime_path": "sounds/chime2.wav",
     "mute_pin": 23,
+    "light_scalar": 1.0,
     "led_config":
     {
         "gpio": 10,

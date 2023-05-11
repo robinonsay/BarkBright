@@ -41,16 +41,19 @@ class NeoPixelLEDStrip:
     def set_color(self, indicies:tuple, color:tuple):
         if IS_RPI:
             for i in range(*indicies):
-                self._pixel_strip.setPixelColor(i, Color(*color))
+                scaled_color = tuple([int(c * bb_config['light_scalar']) for c in color])
+                self._pixel_strip.setPixelColor(i, Color(*scaled_color))
     
     def __setitem__(self, index, value):
         if IS_RPI:
             if isinstance(index, slice):
                 for i in range(*index.indices(len(self))):
-                    self._pixel_strip.setPixelColor(i, Color(*value))
+                    scaled_color = tuple([int(c * bb_config['light_scalar']) for c in value])
+                    self._pixel_strip.setPixelColor(i, Color(*scaled_color))
                     self._current_strip[i] = value
             else:
-                self._pixel_strip.setPixelColor(index, Color(*value))
+                scaled_color = tuple([int(c * bb_config['light_scalar']) for c in value])
+                self._pixel_strip.setPixelColor(i, Color(*scaled_color))
                 self._current_strip[index] = value
     
     def __getitem__(self, index):

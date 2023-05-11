@@ -28,7 +28,7 @@ def collect_data(parent_conn, ready) -> str:
     model = Model(model_path=bb_config['vosk_model_path'])
     recognizer = KaldiRecognizer(model, MODEL_RATE)
     recognizer.SetWords(True)
-    recognizer.SetPartialWords(True)
+    recognizer.SetPartialWords(False)
     print('Running...')
     while True:
         # audio = b''
@@ -44,15 +44,12 @@ def collect_data(parent_conn, ready) -> str:
             print('')
             phrase = str(json.loads(recognizer.Result())['text'])
             yield phrase
-        # else:
-        #     partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
-        #     print(partial_result, end='\r')
 
 def listen(parent_conn, ready):
     model = Model(model_path=bb_config['vosk_model_path'])
     recognizer = KaldiRecognizer(model, MODEL_RATE)
     recognizer.SetWords(True)
-    recognizer.SetPartialWords(True)
+    recognizer.SetPartialWords(False)
     is_wake_word = False
     is_sleep_word = False
     while True:
@@ -87,12 +84,6 @@ def listen(parent_conn, ready):
                     is_sleep_word = False
                 else:
                     yield phrase, is_sleep_word
-        # else:
-        #     partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
-        #     wakeword = is_wakeword(partial_result)
-        #     sleepword = is_sleepword(partial_result)
-        #     is_wake_word = wakeword or is_wake_word
-        #     is_sleep_word = sleepword or is_sleep_word
 
 def is_wakeword(phrase:str):
     ww = None

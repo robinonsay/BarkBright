@@ -1,9 +1,11 @@
-import pyaudio
-import numpy as np
-from TTS.api import TTS
+import subprocess
+from barkbright import bb_config
 
-TTS_MODEL = TTS(model_name='tts_models/en/ljspeech/tacotron2-DCA')
-
-def tts(speaker:pyaudio.Stream, phrase):
-    wav = np.array(TTS_MODEL.tts(phrase))
-    speaker.write(wav.astype(np.float32).tobytes())
+def speak(phrase: str):
+    subprocess.run([
+        'espeak',
+        '-s', str(bb_config['espeak_config']['speed']),
+        '-p', str(bb_config['espeak_config']['pitch']),
+        '-v', str(bb_config['espeak_config']['voice']),
+        phrase
+    ])

@@ -1,0 +1,47 @@
+{
+    "wakeword": 
+    [
+        "hey snoopy",
+        "hey snow be",
+        "he snoopy",
+        "he snow be"
+    ],
+    "sleep_word": 
+    [
+        "thank you",
+        "thanks",
+        "goodbye",
+        "good bye"
+    ],
+    "device": "rpi",
+    "audio_device": "USB Audio Device",
+    "vosk_model_path": "barkbright/models/assets/vosk-model-small-en-us-0.15",
+    "intent_model_path": "barkbright/models/assets/intent_model",
+    "chime_path": "sounds/chime2.wav",
+    "mute_pin": 23,
+    "light_scalar": 1.0,
+    "led_config":
+    {
+        "gpio": 10,
+        "count": 10,
+        "freq_hz": 800000,
+        "dma": 10,
+        "brightness": 255,
+        "invert": false,
+        "channel": 0
+    },
+    "dialogue_editor_config":
+    {
+        "dialogue_path": "dialogue.json"
+    },
+    "intents":
+    [
+        "on",
+        "off",
+        "increase",
+        "decrease",
+        "color",
+        "mode",
+        "unknown"
+    ]
+}

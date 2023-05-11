@@ -159,10 +159,9 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 dataset/dataset.json
-*.xgb
-*.prepipe
-*.le
 *.backup
 .DS_Store
 config.json
 *.key
+porcupine_model
+vosk-model-*

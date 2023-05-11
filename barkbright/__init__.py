@@ -17,11 +17,21 @@ import json
 import pyaudio
 from pathlib import Path
 
+CHUNK_SIZE = 4096
+IN_RATE = 44100
+OUT_RATE = 44100
 CONFIG_PATH = Path(__file__).parent / Path('../config.json')
-MODEL_PATH = Path(__file__).parent / Path('models/assets/vosk-model-small-en-us-0.15')
+DEFAULT_PATH = Path(__file__).parent / Path('../default.json')
 
-with open(CONFIG_PATH, 'r') as f:
+with open(DEFAULT_PATH, 'r') as f:
     bb_config = json.load(f)
+
+if CONFIG_PATH.exists:
+    with open(CONFIG_PATH, 'r') as f:
+        user_config = json.load(f)
+        for key in bb_config.keys():
+            if key in user_config:
+                bb_config[key] = user_config[key]
 
 class Audio:
 
@@ -37,15 +47,13 @@ class Audio:
     
 
 class Speaker:
-    def __init__(self, audio):
+    def __init__(self, audio, **kwargs):
         self._audio = audio
         self._stream = None
+        self._kwargs = kwargs
 
     def __enter__(self):
-        self._stream = self._audio.open(format=pyaudio.paFloat32,
-                                  channels=1,
-                                  rate=22050,  # Ensure this rate matches the sample rate of the TTS model
-                                  output=True)
+        self._stream = self._audio.open(**self._kwargs)
         return self._stream
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -53,20 +61,13 @@ class Speaker:
         self._stream.close()
 
 class Microphone:
-    def __init__(self, audio, rate=16000, chunk=1024, device_index=None):
+    def __init__(self, audio, **kwargs):
         self._audio = audio
         self._stream = None
-        self._rate = rate
-        self._chunk=1024
-        self._device_index = device_index
+        self._kwargs = kwargs
 
     def __enter__(self):
-        self._stream = self._audio.open(format=pyaudio.paInt16,
-                                        channels=1,
-                                        rate=self._rate,
-                                        input=True,
-                                        frames_per_buffer=self._chunk,
-                                        input_device_index=self._device_index)
+        self._stream = self._audio.open(**self._kwargs)
         return self._stream
 
     def __exit__(self, exc_type, exc_value, traceback):

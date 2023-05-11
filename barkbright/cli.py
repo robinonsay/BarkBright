@@ -21,9 +21,16 @@ from barkbright.models.intent import IntentMatchingModel
 from barkbright import parsing
 from dataset import BB_INTENTS
 
-def train():
+def train(preprocessor_only=True):
     intent_model = IntentMatchingModel()
-    if train:
+    if preprocessor_only:
+        print('Training Preprocessor...')
+        start = datetime.now()
+        intent_model.train_preprocessor()
+        delta = datetime.now() - start
+        intent_model.save_preprocessor()
+        print(f" Training Time: {delta.total_seconds()}:.1f")
+    else:
         print('Training...')
         start = datetime.now()
         intent_model.train()

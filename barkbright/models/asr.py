@@ -13,23 +13,69 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-import pyaudio
 import json
+import vosk
 from vosk import Model, KaldiRecognizer
-from pathlib import Path
-from barkbright import bb_config, MODEL_PATH
+from scipy import signal
+import numpy as np
+from barkbright import bb_config, IN_RATE
 
-def listen(mic:pyaudio.Stream, model_path=None, rate=16000, chunk=1024, device_index=None) -> str:
-    model = model_path if model_path else Model(model_path=MODEL_PATH.as_posix())
-    recognizer = KaldiRecognizer(model, rate)
+MODEL_RATE = 16000
+MAX_INT16 = (2**15 - 1)
+vosk.SetLogLevel(-1)
+
+def listen(parent_conn, ready):
+    model = Model(model_path=bb_config['vosk_model_path'])
+    recognizer = KaldiRecognizer(model, MODEL_RATE)
     recognizer.SetWords(True)
     recognizer.SetPartialWords(True)
+    wake_word = False
+    sleep_word = False
     while True:
-        data = mic.read(chunk, exception_on_overflow=False)
-        if recognizer.AcceptWaveform(data):
-            result = json.loads(recognizer.Result())['text'].split()
-            if result and bb_config['wakeword'] == result[0]:
-                result.pop(0)
-                phrase = ' '.join(result)
-                print(phrase)
-                yield phrase
+        audio = b''
+        if not ready.value:
+            ready.value = True
+        while parent_conn.poll():
+            audio += parent_conn.recv_bytes()
+        np_audio = np.frombuffer(audio, dtype=np.int16)
+        np_audio_float = np_audio.astype(np.float32, order='C') / MAX_INT16
+        np_audio_float = signal.resample_poly(np_audio_float, MODEL_RATE, IN_RATE)
+        np_audio = (np_audio_float * MAX_INT16).astype(np.int16)
+        audio = np_audio.tobytes()
+        if recognizer.AcceptWaveform(audio):
+            phrase = str(json.loads(recognizer.Result())['text'])
+            wake_word = is_wakeword(phrase) or wake_word
+            sleep_word = is_sleepword(phrase) or sleep_word
+            if phrase and wake_word:
+                index = phrase.find(bb_config['wakeword'])
+                if index != -1:
+                    phrase = phrase[:index] + phrase[index+len(bb_config['wakeword']):]
+                if sleep_word:
+                    index = phrase.find(bb_config['sleep_word'])
+                    if index != -1:
+                        phrase = phrase[:index]
+                    wake_word = False
+                    yield phrase, sleep_word
+                    sleep_word = False
+                else:
+                    yield phrase, sleep_word
+        else:
+            partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
+            wake_word = is_wakeword(partial_result) or wake_word
+            sleep_word = is_sleepword(partial_result) or sleep_word
+
+def is_wakeword(phrase:str):
+    is_ww = False
+    for wakeword in bb_config['wakeword']:
+        if wakeword in phrase:
+            is_ww = True
+            break
+    return is_ww
+
+def is_sleepword(phrase:str):
+    is_sw = False
+    for sleepword in bb_config['sleep_word']:
+        if sleepword in phrase:
+            is_sw = True
+            break
+    return is_sw

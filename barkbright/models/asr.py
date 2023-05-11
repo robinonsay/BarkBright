@@ -31,7 +31,7 @@ def collect_data(parent_conn, ready) -> str:
     recognizer.SetPartialWords(True)
     print('Running...')
     while True:
-        audio = b''
+        # audio = b''
         if not ready.value:
             ready.value = True
         audio = parent_conn.recv_bytes()
@@ -41,8 +41,12 @@ def collect_data(parent_conn, ready) -> str:
         np_audio = (np_audio_float * MAX_INT16).astype(np.int16)
         audio = np_audio.tobytes()
         if recognizer.AcceptWaveform(audio):
+            print('')
             phrase = str(json.loads(recognizer.Result())['text'])
             yield phrase
+        # else:
+        #     partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
+        #     print(partial_result, end='\r')
 
 def listen(parent_conn, ready):
     model = Model(model_path=bb_config['vosk_model_path'])
@@ -52,11 +56,11 @@ def listen(parent_conn, ready):
     is_wake_word = False
     is_sleep_word = False
     while True:
-        audio = b''
+        # audio = b''
         if not ready.value:
             ready.value = True
-        while parent_conn.poll():
-            audio += parent_conn.recv_bytes()
+        # while parent_conn.poll():
+        audio = parent_conn.recv_bytes()
         np_audio = np.frombuffer(audio, dtype=np.int16)
         np_audio_float = np_audio.astype(np.float32, order='C') / MAX_INT16
         np_audio_float = signal.resample_poly(np_audio_float, MODEL_RATE, IN_RATE)
@@ -83,12 +87,12 @@ def listen(parent_conn, ready):
                     is_sleep_word = False
                 else:
                     yield phrase, is_sleep_word
-        else:
-            partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
-            wakeword = is_wakeword(partial_result)
-            sleepword = is_sleepword(partial_result)
-            is_wake_word = wakeword or is_wake_word
-            is_sleep_word = sleepword or is_sleep_word
+        # else:
+        #     partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
+        #     wakeword = is_wakeword(partial_result)
+        #     sleepword = is_sleepword(partial_result)
+        #     is_wake_word = wakeword or is_wake_word
+        #     is_sleep_word = sleepword or is_sleep_word
 
 def is_wakeword(phrase:str):
     ww = None

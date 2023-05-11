@@ -16,5 +16,6 @@ Copyright 2023 Robin Onsay
 
 KNOWN_MODES = [
     'party',
-    'static'
+    'static',
+    'study',
 ]

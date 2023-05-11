@@ -13,11 +13,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 '''
-import wave
-import pyaudio
 import json
 import vosk
-import time
 from vosk import Model, KaldiRecognizer
 from scipy import signal
 import numpy as np
@@ -34,8 +31,6 @@ def listen(parent_conn, ready):
     recognizer.SetPartialWords(True)
     wake_word = False
     sleep_word = False
-    start = None
-    # print("ASR Running...")
     while True:
         audio = b''
         if not ready.value:
@@ -49,9 +44,8 @@ def listen(parent_conn, ready):
         audio = np_audio.tobytes()
         if recognizer.AcceptWaveform(audio):
             phrase = str(json.loads(recognizer.Result())['text'])
-            wake_word = bb_config['wakeword'] in phrase or wake_word
-            sleep_word = bb_config['sleep_word'] in phrase or sleep_word
-            # print(phrase)
+            wake_word = is_wakeword(phrase) or wake_word
+            sleep_word = is_sleepword(phrase) or sleep_word
             if phrase and wake_word:
                 index = phrase.find(bb_config['wakeword'])
                 if index != -1:
@@ -67,5 +61,21 @@ def listen(parent_conn, ready):
                     yield phrase, sleep_word
         else:
             partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
-            wake_word = bb_config['wakeword'] in partial_result or wake_word
-            sleep_word = bb_config['sleep_word'] in partial_result or sleep_word
+            wake_word = is_wakeword(partial_result) or wake_word
+            sleep_word = is_sleepword(partial_result) or sleep_word
+
+def is_wakeword(phrase:str):
+    is_ww = False
+    for wakeword in bb_config['wakeword']:
+        if wakeword in phrase:
+            is_ww = True
+            break
+    return is_ww
+
+def is_sleepword(phrase:str):
+    is_sw = False
+    for sleepword in bb_config['sleep_word']:
+        if sleepword in phrase:
+            is_sw = True
+            break
+    return is_sw

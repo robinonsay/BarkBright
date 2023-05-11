@@ -1,6 +1,18 @@
 {
-    "wakeword": "hey snoopy",
-    "sleep_word": "thank you",
+    "wakeword": 
+    [
+        "hey snoopy",
+        "hey snow be",
+        "he snoopy",
+        "he snow be"
+    ],
+    "sleep_word": 
+    [
+        "thank you",
+        "thanks",
+        "goodbye",
+        "good bye"
+    ],
     "device": "rpi",
     "audio_device": "USB Audio Device",
     "vosk_model_path": "barkbright/models/assets/vosk-model-small-en-us-0.15",
@@ -11,7 +23,7 @@
     "led_config":
     {
         "gpio": 10,
-        "count": 39,
+        "count": 10,
         "freq_hz": 800000,
         "dma": 10,
         "brightness": 255,

@@ -26,11 +26,12 @@ DEFAULT_PATH = Path(__file__).parent / Path('../default.json')
 with open(DEFAULT_PATH, 'r') as f:
     bb_config = json.load(f)
 
-with open(CONFIG_PATH, 'r') as f:
-    user_config = json.load(f)
-    for key in bb_config.keys():
-        if key in user_config:
-            bb_config[key] = user_config[key]
+if CONFIG_PATH.exists:
+    with open(CONFIG_PATH, 'r') as f:
+        user_config = json.load(f)
+        for key in bb_config.keys():
+            if key in user_config:
+                bb_config[key] = user_config[key]
 
 class Audio:
 

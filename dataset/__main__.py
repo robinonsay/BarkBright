@@ -101,7 +101,9 @@ _number = KeyWord('number', ['55'])
 _set = KeyWord('set', [
     'set',
     'adjust',
-    'change'
+    'change',
+    'make',
+    'turn'
 ])
 
 _color = KeyWord('color', [random.choice(KNOWN_COLORS)])

@@ -46,8 +46,8 @@ class IntentMatchingModel(Model):
         }
 
         self._clf_params = clf_params if clf_params else {
-            'n_estimators': 5000,
-            'max_depth': 6,
+            'n_estimators': 1500,
+            'max_depth': 3,
             'eval_metric': 'mlogloss',
             'early_stopping_rounds': 10,
             'random_state': random_state
@@ -69,7 +69,35 @@ class IntentMatchingModel(Model):
         ])
         self._le = LabelEncoder()
     
-    def train(self, data_path=None, logging=True):
+    def train_preprocessor(self, data_path=None, logging=True):
+        df = None
+        if data_path:
+            df = pd.read_json(data_path)
+        else:
+            df = pd.DataFrame(bb_data)
+        self._preprocess(df)
+        X, y = (df['phrase'].values, df['intent'].values)
+        X, y = self._random_upsample(X, y)
+        self._pre_pipe.fit(X, y)
+        evr = self._pre_pipe.named_steps['svd'].explained_variance_ratio_ * 100
+        num_feats = self._pre_pipe.named_steps['svd'].n_features_in_
+        if logging:
+            print(f'EVR: {evr.sum():.1f}\tNumber of Features: {num_feats}')
+        self._le.fit(y)
+        
+    def save_preprocessor(self, model_name='intent_model'):
+        with open(asset_path / f"{model_name}.prepipe", 'wb') as f:
+            pickle.dump(self._pre_pipe, f)
+        with open(asset_path / f"{model_name}.le", 'wb') as f:
+            pickle.dump(self._le, f)
+    
+    def load_preprocessor(self, model_name='intent_model'):
+        with open(asset_path / f"{model_name}.prepipe", 'rb') as f:
+            self._pre_pipe = pickle.load(f)
+        with open(asset_path / f"{model_name}.le", 'rb') as f:
+            self._le = pickle.load(f)
+
+    def train(self, data_path=None, logging=True, train_preprocessor=False):
         df = None
         if data_path:
             df = pd.read_json(data_path)
@@ -79,17 +107,21 @@ class IntentMatchingModel(Model):
         X, y = (df['phrase'].values, df['intent'].values)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, stratify=y, random_state=random_state)
         X_train, y_train = self._random_upsample(X_train, y_train)
-        if logging:
-            print('Training Preprocessing Pipe...')
-        self._pre_pipe.fit(X_train, y_train)
-        if logging:
-            print('Done')
-            evr = self._pre_pipe.named_steps['svd'].explained_variance_ratio_ * 100
-            num_feats = self._pre_pipe.named_steps['svd'].n_features_in_
-            print(f'EVR: {evr.sum():.1f}\tNumber of Features: {num_feats}')
+        if train_preprocessor:
+            if logging:
+                print('Training Preprocessing Pipe...')
+            self._pre_pipe.fit(X_train, y_train)
+            if logging:
+                print('Done')
+                evr = self._pre_pipe.named_steps['svd'].explained_variance_ratio_ * 100
+                num_feats = self._pre_pipe.named_steps['svd'].n_features_in_
+                print(f'EVR: {evr.sum():.1f}\tNumber of Features: {num_feats}')
         X_train = self._pre_pipe.transform(X_train)
         X_test = self._pre_pipe.transform(X_test)
-        y_train = self._le.fit_transform(y_train)
+        if train_preprocessor:
+            y_train = self._le.fit_transform(y_train)
+        else:
+            y_train - self._le.transform(y_train)
         y_test = self._le.transform(y_test)
         if logging:
             print('Training Model...')

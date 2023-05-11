@@ -83,12 +83,12 @@ def listen(parent_conn, ready):
                     is_sleep_word = False
                 else:
                     yield phrase, is_sleep_word
-        # else:
-        #     partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
-        #     wakeword = is_wakeword(partial_result)
-        #     sleepword = is_sleepword(partial_result)
-        #     is_wake_word = wakeword or is_wake_word
-        #     is_sleep_word = sleepword or is_sleep_word
+        else:
+            partial_result = json.loads(recognizer.PartialResult())['partial'].lower()
+            wakeword = is_wakeword(partial_result)
+            sleepword = is_sleepword(partial_result)
+            is_wake_word = wakeword or is_wake_word
+            is_sleep_word = sleepword or is_sleep_word
 
 def is_wakeword(phrase:str):
     ww = None

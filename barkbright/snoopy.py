@@ -51,8 +51,8 @@ def main():
         with NeoPixelLEDStrip(**bb_config['led_config']) as np_leds:
             quarter_len = len(np_leds) // 4
             np_leds[:quarter_len] = COLOR_MAP['snoopy green']
-            np_leds[quarter_len: quarter_len * 3] = COLOR_MAP['snoopy dark green']
-            np_leds[quarter_len*3:] = COLOR_MAP['snoopy green']
+            np_leds[quarter_len: -quarter_len] = COLOR_MAP['snoopy dark green']
+            np_leds[-quarter_len:] = COLOR_MAP['snoopy green']
             np_leds.show()
             np_leds.show()
             time.sleep(0.5)
@@ -69,8 +69,8 @@ def main():
                 if len(phrase) == 0 and not is_done:
                     transition = 'root'
                     np_leds[:quarter_len] = COLOR_MAP['snoopy green']
-                    np_leds[quarter_len: quarter_len * 2] = COLOR_MAP['snoopy dark green']
-                    np_leds[quarter_len*2:] = COLOR_MAP['snoopy green']
+                    np_leds[quarter_len: -quarter_len] = COLOR_MAP['snoopy dark green']
+                    np_leds[-quarter_len:] = COLOR_MAP['snoopy green']
                     np_leds.show()
                     reset = False
                 elif len(phrase) == 0 and is_done:

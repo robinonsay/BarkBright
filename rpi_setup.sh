@@ -1,7 +1,7 @@
 #!/bin/bash
 
 sudo apt update && sudo apt upgrade
-sudo apt install python-all-dev python3-venv python3-pip pulseaudio portaudio19-dev git espeak make gcc g++
+sudo apt install python-all-dev python3-venv python3-pip pulseaudio portaudio19-dev git espeak make gcc g++ vim
 git clone https://github.com/robinonsay/BarkBright.git && cd BarkBright
 python -m venv venv
 source venv/bin/activate

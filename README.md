@@ -3,36 +3,46 @@ BarkBright is an open-source voice enabled conversational system allowing for ho
 
 ## Features
 * **Voice control:** BarkBright uses [vosk](https://alphacephei.com/vosk/) offline Automatic Speech Recognition (ASR)
-* **Lightweight:** BarkBright is designed to run on embedded architectures like the Raspberry Pi and BeagleBone Black, therefore it **does not require a GPU to train or run the models**
+* **Lightweight:** BarkBright is designed to run on embedded architectures like the Raspberry Pi and BeagleBone Black, therefore it **does not require a GPU to run the models**
 * **Pretrained Intent Model:** BarkBright has a [pretrained model](barkbright/models/assets) availble for use, as well as all the model details so you can build on top of the architecture!
+*  **Dialogue-based interaction:** Users can engage in a conversational manner with BarkBright. This allows for intuitive control of home IoT
 
 ## *Future Features*
 
-*  **Dialogue-based interaction:** Users can engage in a conversational manner with BarkBright. This allows for intuitive control of home IoT
 * **Dataset Creation and Model Updating**: BarkBright can create a dataset based on your interactions with Human-In-The-Loop feedback. This can be used to update or retrain the model completly on commonly used phrases!
 
-## Getting Started
-https://github.com/rpi-ws281x/rpi-ws281x-python/tree/master/library#spi
+## LED Strip Getting Started
+### Parts:
+    * Raspberry Pi (<3b)
+    * USB Audio Adapter
+    * Microphone
+    * Speaker System
+    * WS2812b LEDs
+    * 5V Powersupply
+* Make WS2812b Connections
+    * DIN -> GPIO 10
+        * You may need a logic level shifter
+    * 5V -> Power Supply
+    * GND -> GND
+        * Be sure to connect ground to RPi as well
 * Clone the repo:
     ```
     git clone https://github.com/robinonsay/BarkBright.git
     ```
+* Run RPi Setup Script
+    ```
+    cd BarkBright && chmod +x rpi_setup.sh && ./rpi_setup.sh
+    ```
+* Setup SPI on the RPi: https://github.com/rpi-ws281x/rpi-ws281x-python/tree/master/library#spi
 * Install Dependencies
     ```
     pip3 install -r requirements.txt
+    pip3 install -r rpi_requirements.txt
     ```
-* Download the [ASR model](https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip) to `BarkBright/barkbright/models/assets/`
-* Run the demo
+* Run Snoopy!
     ```
     python -m barkbright
     ```
-* Run the command line chat interface demo
-    ```
-    python -m barkbright --cli
-    ```
-
-## Demo
-The demo will use vosk and [pyaudio](https://people.csail.mit.edu/hubert/pyaudio/) to record and transcribe your voice input and use the intent model to predict the intent.
 
 ## CLI Chat Interface
 

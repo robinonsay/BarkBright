@@ -5,6 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "BarkBright Run ASR",
+            "type": "python",
+            "request": "launch",
+            "module": "barkbright",
+            "justMyCode": true,
+            "args": ["--asr"]
+        },
+        {
             "name": "BarkBright Dialogue Editor",
             "type": "python",
             "request": "launch",

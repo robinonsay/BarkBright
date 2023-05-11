@@ -161,10 +161,9 @@ def decrease_brightness(np_leds:NeoPixelLEDStrip, phrase):
     np_leds.show()
 
 
-def get_audio_device(audio: pyaudio.PyAudio):
+def get_audio_device(audio: pyaudio.PyAudio, device_name="USB Audio Device"):
     device_index = None
     if bb_config['device'] == 'rpi':
-        device_name = "USB Audio Device"
         device_index = -1
         for i in range(audio.get_device_count()):
             device_info = audio.get_device_info_by_index(i)
@@ -179,7 +178,7 @@ def get_audio_device(audio: pyaudio.PyAudio):
 def speaker(conn:Connection, is_speaking:Value, run:Value):
     device_index = None
     with Audio() as audio:
-        device_index = get_audio_device(audio)
+        device_index = get_audio_device(audio, device_name='bcm2835 Headphones')
         while run.value:
             filename = conn.recv()
             if isinstance(filename, str):

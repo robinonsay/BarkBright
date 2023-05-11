@@ -33,7 +33,7 @@ COLOR_MAP = {
     "purple": (128, 0, 128),
     "teal": (0, 128, 128),
     "navy": (0, 0, 128),
-    "warm": (255, 240, 220),
+    "warm": (255, 150, 100),
     "snoopy green": (82, 183, 136),
     "snoopy dark green": (8, 28, 21)
 }

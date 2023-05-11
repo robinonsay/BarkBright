@@ -39,9 +39,13 @@ BarkBright is an open-source voice enabled conversational system allowing for ho
     pip3 install -r requirements.txt
     pip3 install -r rpi_requirements.txt
     ```
-* Run Milo!
+* Run Fido!
     ```
     python -m barkbright
+    ```
+    OR
+    ```
+    ./run.sh
     ```
 
 ## CLI Chat Interface

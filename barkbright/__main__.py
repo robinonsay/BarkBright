@@ -15,7 +15,7 @@ Copyright 2023 Robin Onsay
 '''
 
 import argparse
-from barkbright import cli, demo, fido, run_asr
+from barkbright import cli, demo, run, run_asr
 
 
 parser = argparse.ArgumentParser(prog='BarkBright',
@@ -43,5 +43,5 @@ elif args.demo:
 elif args.asr:
     run_asr.main('asr_out')
 else:
-    fido.main()
+    run.main()
 

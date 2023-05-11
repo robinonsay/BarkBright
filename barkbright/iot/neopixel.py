@@ -53,7 +53,7 @@ class NeoPixelLEDStrip:
                     self._current_strip[i] = value
             else:
                 scaled_color = tuple([int(c * bb_config['light_scalar']) for c in value])
-                self._pixel_strip.setPixelColor(i, Color(*scaled_color))
+                self._pixel_strip.setPixelColor(index, Color(*scaled_color))
                 self._current_strip[index] = value
     
     def __getitem__(self, index):

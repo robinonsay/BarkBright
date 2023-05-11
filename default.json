@@ -5,6 +5,7 @@
     "vosk_model_path": "barkbright/models/assets/vosk-model-small-en-us-0.15",
     "intent_model_path": "barkbright/models/assets/intent_model",
     "chime_path": "sounds/chime2.wav",
+    "mute_pin": 23,
     "led_config":
     {
         "gpio": 10,

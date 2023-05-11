@@ -20,6 +20,7 @@ import random
 import re
 import time
 import numpy as np
+import RPI.GPIO as GPIO
 from scipy import signal
 from pathlib import Path
 from datetime import datetime
@@ -36,6 +37,9 @@ from multiprocessing.connection import Connection
 from dataset import BB_INTENTS
 
 def main():
+    GPIO.setmode(GPIO.BOARD)
+    GPIO.setup(bb_config['mute_pin'], GPIO.OUT)
+    GPIO.output(bb_config['mute_pin'], GPIO.LOW)
     dlg.load_dialogue()
     intent_model = IntentMatchingModel()
     intent_model.load()
@@ -106,6 +110,7 @@ def main():
                         elif intent_str == 'decrease':
                             decrease_brightness(np_leds, p)
                 is_speaking.value = True
+                GPIO.output(bb_config['mute_pin'], GPIO.HIGH)
                 num_phrases = len(dlg.dialogue[str(transition)]['dialogue'].splitlines())
                 parent_speaker_conn.send(f"{transition}_{random.randint(0, num_phrases - 1)}.wav")
                 is_speaking.value = False
@@ -114,6 +119,7 @@ def main():
                     num_phrases = len(dlg.dialogue["sleep"]['dialogue'].splitlines())
                     parent_speaker_conn.send(f"sleep_{random.randint(0, num_phrases - 1)}.wav")
                     is_speaking.value = False
+                GPIO.output(bb_config['mute_pin'], GPIO.LOW)
 
     finally:
         running.value = False

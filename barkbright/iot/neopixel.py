@@ -4,8 +4,10 @@
 #
 # Direct port of the Arduino NeoPixel library strandtest example.  Showcases
 # various animations on a strip of NeoPixels.
+import numpy as np
 from barkbright import bb_config
-import time
+from multiprocessing.connection import Connection
+from multiprocessing import Process, Pipe, Value
 IS_RPI = bb_config['device'] == 'rpi'
 if IS_RPI:
     from rpi_ws281x import PixelStrip, Color
@@ -15,7 +17,7 @@ class NeoPixelLEDStrip:
     def __init__(self, **kwargs):
         self._kwargs = kwargs
         self._pixel_strip = None
-        self._current_strip = [(0,0,0) for i in range(self._kwargs['count'])]
+        self._current_strip = np.zeros((self._kwargs['count'], 3))
     
     def __enter__(self):
         if IS_RPI:
@@ -37,31 +39,24 @@ class NeoPixelLEDStrip:
     
     def __len__(self):
         return self._kwargs['count']
-
-    def set_color(self, indicies:tuple, color:tuple):
-        if IS_RPI:
-            for i in range(*indicies):
-                scaled_color = tuple([int(c * bb_config['light_scalar']) for c in color])
-                self._pixel_strip.setPixelColor(i, Color(*scaled_color))
     
-    def __setitem__(self, index, value):
-        if IS_RPI:
-            if isinstance(index, slice):
-                for i in range(*index.indices(len(self))):
-                    scaled_color = tuple([int(c * bb_config['light_scalar']) for c in value])
-                    self._pixel_strip.setPixelColor(i, Color(*scaled_color))
-                    self._current_strip[i] = value
-            else:
-                scaled_color = tuple([int(c * bb_config['light_scalar']) for c in value])
-                self._pixel_strip.setPixelColor(index, Color(*scaled_color))
-                self._current_strip[index] = value
-    
-    def __getitem__(self, index):
-        return self._current_strip[index]
-    
-    def __iter__(self):
-        return self._current_strip.__iter__()
+    @property
+    def leds(self):
+        return self._current_strip
 
     def show(self):
         if IS_RPI:
+            for i, led in enumerate(self._current_strip):
+                self._pixel_strip.setPixelColor(i, tuple(led))
             self._pixel_strip.show()
+
+def light_manager(conn:Connection, run:Value, run_function:Value):
+    with NeoPixelLEDStrip(**bb_config['led_config']) as leds:
+        while run.value:
+            colors = conn.recv()
+            if isinstance(colors, np.ndarray):
+                leds.leds[:] = colors
+                leds.show()
+            elif callable(colors):
+                colors(leds, run_function)
+                run_function.value = True

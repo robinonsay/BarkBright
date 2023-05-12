@@ -20,8 +20,6 @@ import random
 import nltk
 from dataset import bb_data, BB_INTENTS, bb_data_path
 from pathlib import Path
-from barkbright.colors import KNOWN_COLORS
-from barkbright.modes import KNOWN_MODES
 from nltk.corpus import brown
 nltk.download('brown')
 
@@ -106,9 +104,9 @@ _set = KeyWord('set', [
     'turn'
 ])
 
-_color = KeyWord('color', [random.choice(KNOWN_COLORS)])
+_color = KeyWord('color', ['red'])
 
-_mode = KeyWord('mode', [random.choice(KNOWN_MODES)])
+_mode = KeyWord('mode', ['party'])
 
 keywords = [_on, _off, _prephrase, _postphrase, _prep, _light, _number, _set, _color, _mode]
 keyword_re = r'<\w+>'

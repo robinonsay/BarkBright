@@ -19,7 +19,7 @@ import pandas as pd
 import pickle
 from pathlib import Path
 from barkbright.models import Model, random_state
-from barkbright import colors, modes, bb_config
+from barkbright import bb_config
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.decomposition import TruncatedSVD
 from sklearn.model_selection import train_test_split
@@ -192,9 +192,9 @@ class IntentMatchingModel(Model):
     def _preprocess(self, df:pd.DataFrame):
         df['phrase'] = df['phrase'].str.lower()
         df['phrase'] = df['phrase'].str.replace(r'\d+\.\d+|\d+', '<number>', regex=True)
-        for color in colors.COLOR_MAP.keys():
+        for color in bb_config['colors'].keys():
             df['phrase'] = df['phrase'].str.replace(color, '<color>')
-        for mode in modes.KNOWN_MODES:
+        for mode in bb_config['modes'].keys():
             df['phrase'] = df['phrase'].str.replace(mode, '<mode>')
 
     def _random_upsample(self, X, y):

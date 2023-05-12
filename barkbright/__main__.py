@@ -15,7 +15,7 @@ Copyright 2023 Robin Onsay
 '''
 
 import argparse
-from barkbright import cli, demo, run, run_asr
+from barkbright import cli, run_asr, runner
 
 
 parser = argparse.ArgumentParser(prog='BarkBright',
@@ -23,7 +23,6 @@ parser = argparse.ArgumentParser(prog='BarkBright',
 parser.add_argument('-c', '--cli', action='store_true')
 parser.add_argument('-t', '--train', action='store_true')
 parser.add_argument('-d', '--dialogue_editor', action='store_true')
-parser.add_argument('--demo', action='store_true')
 parser.add_argument('--asr', action='store_true')
 
 args = parser.parse_args()
@@ -38,10 +37,8 @@ elif args.dialogue_editor:
     dpg.create_context()
     dialogue_editor.main()
     dpg.destroy_context()
-elif args.demo:
-    demo.main()
 elif args.asr:
     run_asr.main('asr_out')
 else:
-    run.main()
+    runner.main()
 

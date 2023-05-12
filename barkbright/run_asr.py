@@ -9,12 +9,11 @@ from pathlib import Path
 from datetime import datetime
 from barkbright.models.intent import IntentMatchingModel
 from barkbright import Audio, Speaker, Microphone, CHUNK_SIZE, bb_config, IN_RATE
-from barkbright import parsing, colors, modes
+from barkbright import parsing
 from barkbright.word2num import word2num
 from barkbright import dialogue as dlg
 from barkbright.models import asr
 from barkbright.iot.neopixel import NeoPixelLEDStrip
-from barkbright.colors import COLOR_MAP
 from multiprocessing import Process, Pipe, Value
 from multiprocessing.connection import Connection
 from dataset import BB_INTENTS

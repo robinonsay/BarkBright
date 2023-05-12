@@ -56,9 +56,9 @@ def light_manager(conn:Connection, run:Value, run_function:Value):
     with NeoPixelLEDStrip(**bb_config['led_config']) as leds:
         while run.value:
             colors = conn.recv()
+            run_function.value = True
             if isinstance(colors, np.ndarray):
                 leds.leds[:] = colors
                 leds.show()
             elif callable(colors):
                 colors(leds, run_function)
-                run_function.value = True

@@ -47,7 +47,9 @@ class NeoPixelLEDStrip:
     def show(self):
         if IS_RPI:
             for i, led in enumerate(self._current_strip):
-                self._pixel_strip.setPixelColor(i, tuple(led))
+                color = tuple(led)
+                color = tuple([int(c) for c in color])
+                self._pixel_strip.setPixelColor(i, Color(*color))
             self._pixel_strip.show()
 
 def light_manager(conn:Connection, run:Value, run_function:Value):

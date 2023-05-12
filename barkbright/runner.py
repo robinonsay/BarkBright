@@ -207,9 +207,10 @@ def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
     mu = 0
     x = np.linspace(0, sunset_colors.shape[0])
     gaussian = np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
+    gaussian = gaussian[:, np.newaxis]
     i = 0
     while run_function.value:
-        neo_leds.leds[:] = sunset_colors * gaussian
+        neo_leds.leds[:] = np.multiply(sunset_colors, gaussian)
         sunset_colors = np.roll(sunset_colors, i)
         time.sleep(0.1)
         i = (i + 1) % sunset_colors.shape[0]

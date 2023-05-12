@@ -130,6 +130,7 @@ def color_change(np_leds:NeoPixelLEDStrip, phrase):
     for word in phrase.split():
         if word in COLOR_MAP:
             np_leds[:] = COLOR_MAP[word]
+            break
     np_leds.show()
 
 def increase_brightness(np_leds:NeoPixelLEDStrip, phrase):
@@ -211,7 +212,6 @@ def microphone(conn:Connection, is_speaking:Value, run:Value, ready:Value):
         while not ready.value:
             time.sleep(0.1)
         with Microphone(audio, **config) as mic:
-            # print('Snooopy Listening...')
             record = True
             while run.value:
                 if record and not is_speaking.value:

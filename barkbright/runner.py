@@ -172,7 +172,7 @@ def engage_sunset_mode(light_mngr_conn, phrase):
         light_mngr_conn.send(party_mode)
 
 def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
-    sunset_colors = np.array([
+    party_colors = np.array([
         bb_config['colors']['red'],
         bb_config['colors']['orange'],
         bb_config['colors']['yellow'],
@@ -181,15 +181,15 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
         bb_config['colors']['blue'],
         bb_config['colors']['purple'],
     ])
-    n_tiles = neo_leds.leds.shape[0] // sunset_colors.shape[0]
-    remainder = neo_leds.leds.shape[0] % sunset_colors.shape[0]
-    sunset_colors = np.concatenate([np.tile(sunset_colors, (n_tiles, 1)), sunset_colors[:remainder, :]])
+    n_tiles = neo_leds.leds.shape[0] // party_colors.shape[0]
+    remainder = neo_leds.leds.shape[0] % party_colors.shape[0]
+    party_colors = np.concatenate([np.tile(party_colors, (n_tiles, 1)), party_colors[:remainder+1, :]])
     i = 0
     while run_function.value:
-        neo_leds.leds[:] = sunset_colors
-        sunset_colors = np.roll(sunset_colors, i)
-        time.sleep(0.05)
-        i = (i + 1) % sunset_colors.shape[0]
+        neo_leds.leds[:] = party_colors
+        party_colors = np.roll(party_colors, i)
+        time.sleep(0.1)
+        i = (i + 1) % party_colors.shape[0]
         neo_leds.show()
 
 def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
@@ -202,12 +202,16 @@ def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
     ])
     n_tiles = neo_leds.leds.shape[0] // sunset_colors.shape[0]
     remainder = neo_leds.leds.shape[0] % sunset_colors.shape[0]
-    sunset_colors = np.concatenate([np.tile(sunset_colors, (n_tiles, 1)), sunset_colors[:remainder, :]])
+    sunset_colors = np.concatenate([np.tile(sunset_colors, (n_tiles, 1)), sunset_colors[:remainder+1, :]])
+    sig = 2
+    mu = 0
+    x = np.linspace(0, sunset_colors.shape[0])
+    gaussian = np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.)))
     i = 0
     while run_function.value:
-        neo_leds.leds[:] = sunset_colors
+        neo_leds.leds[:] = sunset_colors * gaussian
         sunset_colors = np.roll(sunset_colors, i)
-        time.sleep(0.05)
+        time.sleep(0.1)
         i = (i + 1) % sunset_colors.shape[0]
         neo_leds.show()
 

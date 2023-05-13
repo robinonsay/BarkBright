@@ -150,9 +150,9 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             max_bass = np.mean(buffer)
             bass_norm = bass / max_bass
             arglights = int(bass_norm * neo_leds.strip.shape[0] // 2)
+            center = neo_leds.strip.shape[0] // 2
             a = max(0, center-arglights)
             b = min(neo_leds.strip.shape[0], center+arglights)
-            center = neo_leds.strip.shape[0] // 2
             neo_leds.strip[:a] = background_color[:a]
             neo_leds.strip[a:b] = party_colors[a:b]
             neo_leds.strip[b:] = background_color[b:]

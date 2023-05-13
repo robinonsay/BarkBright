@@ -128,6 +128,7 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
         bb_config['colors']['blue'],
         bb_config['colors']['purple'],
     ])
+    background_color = neo_leds.strip
     n_tiles = neo_leds.strip.shape[0] // party_colors.shape[0]
     remainder = neo_leds.strip.shape[0] % party_colors.shape[0]
     party_colors = np.concatenate([np.tile(party_colors, (n_tiles, 1)), party_colors[:remainder, :]])
@@ -146,9 +147,9 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             bass_norm = bass / MAX_BASS
             arglights = int(bass_norm * neo_leds.strip.shape[0] // 2)
             center = neo_leds.strip.shape[0] // 2
-            neo_leds.strip[:center-arglights] = (0,0,0)
+            neo_leds.strip[:center-arglights] = background_color[:center-arglights]
             neo_leds.strip[center-arglights:center+arglights] = party_colors[center-arglights:center+arglights]
-            neo_leds.strip[center+arglights:] = (0,0,0)
+            neo_leds.strip[center+arglights:] = background_color[center+arglights:]
             neo_leds.show()
             if 60 < time.time() - start:
                 MAX_BASS = 1

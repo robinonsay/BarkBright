@@ -151,7 +151,7 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             heapq.heappush(mids_buffer, mid_range)
             if len(bass_buffer) >= BUFFER_SIZE:
                 heapq.heappop(bass_buffer)
-            if len(mid_range) >= BUFFER_SIZE:
+            if len(mids_buffer) >= BUFFER_SIZE:
                 heapq.heappop(mids_buffer)
             max_mids = np.mean(mids_buffer)
             max_bass = np.mean(bass_buffer)

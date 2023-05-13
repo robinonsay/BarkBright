@@ -86,16 +86,17 @@ def main():
                         transition = 'root'
                         reset = False
                     else:
-                        transition_map = dlg.dialogue[str(transition)]['transition']
-                        if intent_str in transition_map:
-                            transition = transition_map[intent_str]
-                        else:
-                            while 'hub' in transition_map:
-                                transition = transition_map['hub']
-                                transition_map = dlg.dialogue[str(transition)]['transition']
-                                if intent_str in transition_map:
-                                    transition = transition_map[intent_str]
-                                    break
+                        if 'transition' in dlg.dialogue[str(transition)]:
+                            transition_map = dlg.dialogue[str(transition)]['transition']
+                            if intent_str in transition_map:
+                                transition = transition_map[intent_str]
+                            else:
+                                while 'hub' in transition_map:
+                                    transition = transition_map['hub']
+                                    transition_map = dlg.dialogue[str(transition)]['transition']
+                                    if intent_str in transition_map:
+                                        transition = transition_map[intent_str]
+                                        break
                     if intent_str == 'on':
                         run_function.value = False
                         on(light_mngr_conn, leds)
@@ -213,9 +214,9 @@ def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
     while run_function.value:
         neo_leds.leds[:] = np.floor(sunset_colors * gaussian)
         sunset_colors = np.roll(sunset_colors, i, axis=0)
-        time.sleep(0.1)
-        i = (i + 1) % sunset_colors.shape[0]
         neo_leds.show()
+        i = (i + 1) % sunset_colors.shape[0]
+        time.sleep(0.1)
 
 
 def get_audio_device(audio: pyaudio.PyAudio):

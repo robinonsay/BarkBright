@@ -131,26 +131,21 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
         neo_leds.show()
 
 def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
-    sunset_colors = np.array([
-        bb_config['colors']['yellow'],
-        bb_config['colors']['red'],
-        bb_config['colors']['orange'],
-        bb_config['colors']['pink'],
-        bb_config['colors']['purple'],
-    ])
-    n_tiles = neo_leds.strip.shape[0] // sunset_colors.shape[0]
-    remainder = neo_leds.strip.shape[0] % sunset_colors.shape[0]
-    sunset_colors = np.concatenate([np.tile(sunset_colors, (n_tiles, 1)), sunset_colors[:remainder, :]])
-    sig = 50
-    mu = 0
-    x = np.linspace(-100, 100, sunset_colors.shape[0])
-    gaussian = np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.))) + 1
-    gaussian = gaussian[:, np.newaxis]
-    gaussian = (gaussian-np.min(gaussian))/ (np.max(gaussian)-np.min(gaussian))
-    i = 0
+    color_animation = [
+        np.array([
+            bb_config['colors']['red'],
+            bb_config['colors']['purple'],
+            bb_config['colors']['orange'],
+        ]),
+        np.array([
+            (255,200,10),
+            bb_config['colors']['red'],
+        ]),
+    ]
     while run_function.value:
-        neo_leds.strip[:] = sunset_colors * gaussian
-        neo_leds.show()
-        sunset_colors = np.roll(sunset_colors, i, axis=0)
-        i = (i + 1) % sunset_colors.shape[0]
-        time.sleep(0.1)
+        for sunset_colors in color_animation:
+            n_tiles = neo_leds.strip.shape[0] // sunset_colors.shape[0]
+            remainder = neo_leds.strip.shape[0] % sunset_colors.shape[0]
+            neo_leds.strip[:] =  np.concatenate([np.tile(sunset_colors, (n_tiles, 1)), sunset_colors[:remainder, :]])
+            neo_leds.show()
+            time.sleep(0.1)

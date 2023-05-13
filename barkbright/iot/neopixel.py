@@ -124,8 +124,9 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
     remainder = neo_leds.strip.shape[0] % party_colors.shape[0]
     party_colors = np.concatenate([np.tile(party_colors, (n_tiles, 1)), party_colors[:remainder, :]])
     i = 0
-    MAX_BASS = 0
+    MAX_BASS = 1
     fft_conn.send(True)
+    start = time.time()
     while run_function.value:
         if fft_conn.poll(0.1):
             audio_bytes = fft_conn.recv_bytes()
@@ -140,6 +141,10 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             neo_leds.strip[arglights:-arglights] = (0,0,0)
             neo_leds.strip[-arglights:] = party_colors[-arglights:]
             neo_leds.show()
+            if 60 < time.time() - start:
+                MAX_BASS = 1
+    fft_conn.send(False)
+
 
 def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
     color_animation = [

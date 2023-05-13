@@ -144,8 +144,16 @@ def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
     ]
     while run_function.value:
         for sunset_colors in color_animation:
+            for i in range(0, 100, 1):
+                neo_leds.set_brightness(1 - i/100)
+                neo_leds.show()
+                time.sleep(0.1)
             n_tiles = neo_leds.strip.shape[0] // sunset_colors.shape[0]
             remainder = neo_leds.strip.shape[0] % sunset_colors.shape[0]
             neo_leds.strip[:] =  np.concatenate([np.tile(sunset_colors, (n_tiles, 1)), sunset_colors[:remainder, :]])
+            neo_leds.set_brightness(0)
             neo_leds.show()
-            time.sleep(0.1)
+            for i in range(0, 100, 1):
+                neo_leds.set_brightness(i/100)
+                neo_leds.show()
+                time.sleep(0.1)

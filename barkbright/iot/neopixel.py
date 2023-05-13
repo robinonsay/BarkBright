@@ -132,10 +132,12 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             audio = np.frombuffer(audio_bytes, dtype=np.int16)
             audio = audio.astype(np.float32, order='C') / 2**15
             audio_fft = np.abs(fft.fft(audio))
-            bass = np.max(audio_fft[40:500])
+            bass = np.mean(audio_fft[16:256])
             MAX_BASS = bass if bass > MAX_BASS else MAX_BASS
             bass_norm = bass / MAX_BASS
-            neo_leds.set_brightness(bass_norm)
+            arglights = bass_norm * neo_leds.strip.shape[0] // 2
+            neo_leds.strip[:arglights] = party_colors[:arglights]
+            neo_leds.strip[-arglights:] = party_colors[:arglights]
             neo_leds.show()
 
 def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):

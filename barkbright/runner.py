@@ -187,7 +187,7 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
     i = 0
     while run_function.value:
         neo_leds.leds[:] = party_colors
-        party_colors = np.roll(party_colors, i)
+        party_colors = np.roll(party_colors, i, axis=0)
         time.sleep(0.5)
         i = (i + 1) % party_colors.shape[0]
         neo_leds.show()

@@ -137,7 +137,8 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             bass_norm = bass / MAX_BASS
             arglights = int(bass_norm * neo_leds.strip.shape[0] // 2)
             neo_leds.strip[:arglights] = party_colors[:arglights]
-            neo_leds.strip[-arglights:] = party_colors[:arglights]
+            neo_leds.strip[arglights:-arglights] = (0,0,0)
+            neo_leds.strip[-arglights:] = party_colors[-arglights:]
             neo_leds.show()
 
 def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):

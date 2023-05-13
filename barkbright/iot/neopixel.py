@@ -136,7 +136,8 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
     i = 0
     fft_conn.send(True)
     start = time.time()
-    buffer = list()
+    bass_buffer = list()
+    mids_buffer = list()
     BUFFER_SIZE = 50
     while run_function.value:
         if fft_conn.poll(0.1):
@@ -145,23 +146,32 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             audio = audio.astype(np.float32, order='C') / 2**15
             audio_fft = np.abs(fft.fft(audio))
             bass = np.sum(audio_fft[1:200])
-            heapq.heappush(buffer, bass)
-            if len(buffer) >= BUFFER_SIZE:
-                heapq.heappop(buffer)
-            max_bass = np.mean(buffer)
+            mid_range = np.sum(audio_fft[200:850])
+            heapq.heappush(bass_buffer, bass)
+            heapq.heappush(mids_buffer, mid_range)
+            if len(bass_buffer) >= BUFFER_SIZE:
+                heapq.heappop(bass_buffer)
+            if len(mid_range) >= BUFFER_SIZE:
+                heapq.heappop(mids_buffer)
+            max_mids = np.mean(mids_buffer)
+            max_bass = np.mean(bass_buffer)
+            mid_range_norm = mid_range / max_mids
             bass_norm = bass / max_bass
-            arglights = int(bass_norm * neo_leds.strip.shape[0] // 2)
+            arglights_bass = int(bass_norm * neo_leds.strip.shape[0] // 3)
+            arglights_mids = int(mid_range_norm * neo_leds.strip.shape[0] // 3)
             center = neo_leds.strip.shape[0] // 2
-            a = max(0, center-arglights)
-            b = min(neo_leds.strip.shape[0], center+arglights)
-            neo_leds.strip[:a] = background_color[:a]
+            a = max(0, center-arglights_bass)
+            b = min(neo_leds.strip.shape[0], center+arglights_bass)
+            neo_leds.strip[:arglights_mids] = bb_config['colors']['cyan']
+            neo_leds.strip[arglights_mids:a] = background_color[arglights_mids:a]
             neo_leds.strip[a:b] = party_colors[a:b]
-            neo_leds.strip[b:] = background_color[b:]
+            neo_leds.strip[b:-arglights_mids] = background_color[b:-arglights_mids]
+            neo_leds.strip[-arglights_mids:] = bb_config['colors']['cyan']
             neo_leds.show()
             if 120 < time.time() - start:
-                last = heapq.heappop(buffer)
-                buffer.clear()
-                heapq.heappush(buffer, last)
+                last = heapq.heappop(bass_buffer)
+                bass_buffer.clear()
+                heapq.heappush(bass_buffer, last)
                 start = time.time()
     fft_conn.send(False)
 

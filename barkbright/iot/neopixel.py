@@ -133,9 +133,10 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
     remainder = neo_leds.strip.shape[0] % party_colors.shape[0]
     party_colors = np.concatenate([np.tile(party_colors, (n_tiles, 1)), party_colors[:remainder, :]])
     i = 0
-    MAX_BASS = 1
     fft_conn.send(True)
     start = time.time()
+    buffer = list()
+    BUFFER_SIZE = 100
     while run_function.value:
         if fft_conn.poll(0.1):
             audio_bytes = fft_conn.recv_bytes()
@@ -143,13 +144,18 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             audio = audio.astype(np.float32, order='C') / 2**15
             audio_fft = np.abs(fft.fft(audio))
             bass = np.mean(audio_fft[16:200])
-            MAX_BASS = bass if bass > MAX_BASS else MAX_BASS
-            bass_norm = bass / MAX_BASS
+            buffer.append(bass)
+            if len(buffer) >= BUFFER_SIZE:
+                buffer.pop(0)
+            max_bass = np.mean(buffer)
+            bass_norm = bass / max_bass
             arglights = int(bass_norm * neo_leds.strip.shape[0] // 2)
+            a = max(0, center-arglights)
+            b = min(neo_leds.strip.shape[0], center+arglights)
             center = neo_leds.strip.shape[0] // 2
-            neo_leds.strip[:center-arglights] = background_color[:center-arglights]
-            neo_leds.strip[center-arglights:center+arglights] = party_colors[center-arglights:center+arglights]
-            neo_leds.strip[center+arglights:] = background_color[center+arglights:]
+            neo_leds.strip[:a] = background_color[:a]
+            neo_leds.strip[a:b] = party_colors[a:b]
+            neo_leds.strip[b:] = background_color[b:]
             neo_leds.show()
             if 60 < time.time() - start:
                 MAX_BASS = 1

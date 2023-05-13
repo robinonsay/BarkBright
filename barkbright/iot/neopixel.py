@@ -60,6 +60,14 @@ class NeoPixelLEDStrip:
                 color = tuple([int(self._brightness * c) for c in color])
                 self._pixel_strip.setPixelColor(i, Color(*color))
             self._pixel_strip.show()
+    
+    def set(self, i, value):
+        if IS_RPI:
+            self._current_strip[i] = value
+            color = tuple(self._current_strip[i])
+            color = tuple([int(self._brightness * c) for c in color])
+            self._pixel_strip.setPixelColor(i, Color(*color))
+            self._pixel_strip.show()
 
 def light_manager(conn:Connection, run:Value, run_function:Value):
     with NeoPixelLEDStrip(**bb_config['led_config']) as neo_leds:
@@ -133,13 +141,14 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             audio = np.frombuffer(audio_bytes, dtype=np.int16)
             audio = audio.astype(np.float32, order='C') / 2**15
             audio_fft = np.abs(fft.fft(audio))
-            bass = np.mean(audio_fft[16:256])
+            bass = np.mean(audio_fft[16:200])
             MAX_BASS = bass if bass > MAX_BASS else MAX_BASS
             bass_norm = bass / MAX_BASS
-            arglights = int((1 - bass_norm) * neo_leds.strip.shape[0] // 2)
-            neo_leds.strip[:arglights] = (0,0,0)
-            neo_leds.strip[arglights:-arglights] = party_colors[arglights:-arglights]
-            neo_leds.strip[-arglights:] = (0,0,0)
+            arglights = int(bass_norm * neo_leds.strip.shape[0] // 2)
+            center = neo_leds.strip.shape[0] // 2
+            neo_leds.strip[:center-arglights] = (0,0,0)
+            neo_leds.strip[center-arglights:center+arglights] = party_colors[center-arglights:center+arglights]
+            neo_leds.strip[center+arglights:] = (0,0,0)
             neo_leds.show()
             if 60 < time.time() - start:
                 MAX_BASS = 1

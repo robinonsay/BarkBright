@@ -144,7 +144,7 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             audio = np.frombuffer(audio_bytes, dtype=np.int16)
             audio = audio.astype(np.float32, order='C') / 2**15
             audio_fft = np.abs(fft.fft(audio))
-            bass = np.mean(audio_fft[16:200])
+            bass = np.sum(audio_fft[1:200])
             heapq.heappush(buffer, bass)
             if len(buffer) >= BUFFER_SIZE:
                 heapq.heappop(buffer)

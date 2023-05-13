@@ -187,11 +187,15 @@ def microphone(conn:Connection, fft_conn:Connection, is_speaking:Value, run:Valu
             time.sleep(0.1)
         with Microphone(audio, **config) as mic:
             record = True
+            send_to_fft = False
             while run.value:
+                if fft_conn.poll():
+                    send_to_fft = fft_conn.recv()
                 if record and not is_speaking.value:
                     audio = mic.read(CHUNK_SIZE, exception_on_overflow=False)
                     conn.send_bytes(audio)
-                    fft_conn.send_bytes(audio)
+                    if send_to_fft:
+                        fft_conn.send_bytes(audio)
                 elif record:
                     mic.stop_stream()
                     record = False

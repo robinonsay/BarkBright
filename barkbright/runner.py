@@ -29,7 +29,7 @@ from barkbright import parsing
 from barkbright.word2num import word2num
 from barkbright import dialogue as dlg
 from barkbright.models import asr
-from barkbright.iot.neopixel import NeoPixelLEDStrip, light_manager
+from barkbright.iot import neopixel
 from multiprocessing import Process, Pipe, Value
 from multiprocessing.connection import Connection
 
@@ -54,14 +54,15 @@ def main():
     parent_speaker_conn, child_speaker_conn = Pipe()
     prcs_spkr = Process(target=speaker, args=(child_speaker_conn, is_speaking, running))
     light_mngr_conn,  child_light_mngr_conn = Pipe()
-    prcs_light_mngr = Process(target=light_manager, args=(child_light_mngr_conn, running, run_function))
+    prcs_light_mngr = Process(target=neopixel.light_manager, args=(child_light_mngr_conn, running, run_function))
     leds = np.zeros((bb_config['led_config']['count'], 3))
     try:
         prcs_light_mngr.start()
-        led_listening(light_mngr_conn, leds)
+        run_function.value = False
+        light_mngr_conn.send((neopixel.on, None))
         time.sleep(0.5)
-        leds[:] = bb_config['colors']['black']
-        light_mngr_conn.send(leds)
+        run_function.value = False
+        light_mngr_conn.send((neopixel.off, None))
         prcs_mic.start()
         prcs_spkr.start()
         transition = 'root'
@@ -97,24 +98,30 @@ def main():
                                     if intent_str in transition_map:
                                         transition = transition_map[intent_str]
                                         break
+                        else:
+                            print(f'INVAID TRANSITION: {transition}')
+                            transition = 'root'
                     if intent_str == 'on':
                         run_function.value = False
-                        on(light_mngr_conn, leds)
+                        light_mngr_conn.send((neopixel.on, None))
                     elif intent_str == 'off':
                         run_function.value = False
-                        off(light_mngr_conn, leds)
+                        light_mngr_conn.send((neopixel.off, None))
                     elif intent_str == 'color':
                         run_function.value = False
-                        color_change(light_mngr_conn, leds, p)
+                        light_mngr_conn.send((neopixel.color_change, (p,)))
                     elif intent_str == 'increase':
                         run_function.value = False
-                        increase_brightness(light_mngr_conn, leds, p)
+                        light_mngr_conn.send((neopixel.increase_brightness, (p,)))
                     elif intent_str == 'decrease':
                         run_function.value = False
-                        decrease_brightness(light_mngr_conn, leds, p)
+                        light_mngr_conn.send((neopixel.decrease_brightness, (p,)))
                     elif intent_str == 'mode':
                         run_function.value = False
-                        engage_sunset_mode(light_mngr_conn, p)
+                        if 'sunset' in p:
+                            light_mngr_conn.send((neopixel.sunset_mode, None))
+                        if 'party' in p:
+                            light_mngr_conn.send((neopixel.party_mode, None))
             is_speaking.value = True
             num_phrases = len(dlg.dialogue[str(transition)]['dialogue'].splitlines())
             parent_speaker_conn.send(f"{transition}_{random.randint(0, num_phrases - 1)}.wav")
@@ -126,97 +133,6 @@ def main():
                 is_speaking.value = False
     finally:
         running.value = False
-
-def on(light_mngr_conn:Connection, leds:np.ndarray):
-    leds[:] = bb_config['colors']['warm']
-    light_mngr_conn.send(leds)
-
-def off(light_mngr_conn:Connection, leds:np.ndarray):
-    leds[:] = bb_config['colors']['black']
-    light_mngr_conn.send(leds)
-
-def color_change(light_mngr_conn:Connection, leds:np.ndarray, phrase):
-    for word in phrase.split():
-        if word in bb_config['colors']:
-            leds[:] = bb_config['colors'][word]
-            break
-    light_mngr_conn.send(leds)
-
-def increase_brightness(light_mngr_conn:Connection, leds:np.ndarray, phrase):
-    amount = re.findall(r'\d+\.\d+|\d+', phrase)
-    if amount:
-        amount = float(amount[0])
-        if amount >= 1:
-            amount = amount / 100
-    else:
-        amount = 0.2
-    leds[:] = leds * (1+amount)
-    leds[leds > 255] = 255
-    light_mngr_conn.send(leds)
-
-def decrease_brightness(light_mngr_conn, leds, phrase):
-    amount = re.findall(r'\d+\.\d+|\d+', phrase)
-    if amount:
-        amount = float(amount[0])
-        if amount >= 1:
-            amount = amount / 100
-    else:
-        amount = 0.2
-    leds[:] = leds * (1-amount)
-    leds[leds < 0] = 0
-    light_mngr_conn.send(leds)
-
-def engage_sunset_mode(light_mngr_conn, phrase):
-    if 'sunset' in phrase:
-        light_mngr_conn.send(sunset_mode)
-    if 'party' in phrase:
-        light_mngr_conn.send(party_mode)
-
-def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
-    party_colors = np.array([
-        bb_config['colors']['red'],
-        bb_config['colors']['orange'],
-        bb_config['colors']['yellow'],
-        bb_config['colors']['lime'],
-        bb_config['colors']['cyan'],
-        bb_config['colors']['blue'],
-        bb_config['colors']['purple'],
-    ])
-    n_tiles = neo_leds.leds.shape[0] // party_colors.shape[0]
-    remainder = neo_leds.leds.shape[0] % party_colors.shape[0]
-    party_colors = np.concatenate([np.tile(party_colors, (n_tiles, 1)), party_colors[:remainder, :]])
-    i = 0
-    while run_function.value:
-        neo_leds.leds[:] = party_colors
-        party_colors = np.roll(party_colors, i, axis=0)
-        time.sleep(0.1)
-        i = (i + 1) % party_colors.shape[0]
-        neo_leds.show()
-
-def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
-    sunset_colors = np.array([
-        bb_config['colors']['yellow'],
-        bb_config['colors']['red'],
-        bb_config['colors']['orange'],
-        bb_config['colors']['pink'],
-        bb_config['colors']['purple'],
-    ])
-    n_tiles = neo_leds.leds.shape[0] // sunset_colors.shape[0]
-    remainder = neo_leds.leds.shape[0] % sunset_colors.shape[0]
-    sunset_colors = np.concatenate([np.tile(sunset_colors, (n_tiles, 1)), sunset_colors[:remainder, :]])
-    sig = 1
-    mu = 0
-    x = np.linspace(-3, 3, sunset_colors.shape[0])
-    gaussian = np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.))) + 1
-    gaussian = gaussian[:, np.newaxis]
-    gaussian = gaussian / np.max(gaussian)
-    i = 0
-    while run_function.value:
-        neo_leds.leds[:] = np.floor(sunset_colors * gaussian)
-        sunset_colors = np.roll(sunset_colors, i, axis=0)
-        neo_leds.show()
-        i = (i + 1) % sunset_colors.shape[0]
-        time.sleep(0.1)
 
 
 def get_audio_device(audio: pyaudio.PyAudio):

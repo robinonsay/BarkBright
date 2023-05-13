@@ -50,7 +50,8 @@ def main():
     ready = Value('B', False)
     is_speaking = Value('B', False)
     parent_mic_conn, child_mic_conn = Pipe()
-    prcs_mic = Process(target=microphone, args=(child_mic_conn, is_speaking, running, ready))
+    fft_conn, child_fft_conn = Pipe()
+    prcs_mic = Process(target=microphone, args=(child_mic_conn, child_fft_conn, is_speaking, running, ready))
     parent_speaker_conn, child_speaker_conn = Pipe()
     prcs_spkr = Process(target=speaker, args=(child_speaker_conn, is_speaking, running))
     light_mngr_conn,  child_light_mngr_conn = Pipe()
@@ -121,7 +122,7 @@ def main():
                         if 'sunset' in p:
                             light_mngr_conn.send((neopixel.sunset_mode, None))
                         if 'party' in p:
-                            light_mngr_conn.send((neopixel.party_mode, None))
+                            light_mngr_conn.send((neopixel.party_mode, (fft_conn,)))
             is_speaking.value = True
             num_phrases = len(dlg.dialogue[str(transition)]['dialogue'].splitlines())
             parent_speaker_conn.send(f"{transition}_{random.randint(0, num_phrases - 1)}.wav")
@@ -171,7 +172,7 @@ def speaker(conn:Connection, is_speaking:Value, run:Value):
                     speaker.write(audio_data)
                 is_speaking.value = False
 
-def microphone(conn:Connection, is_speaking:Value, run:Value, ready:Value):
+def microphone(conn:Connection, fft_conn:Connection, is_speaking:Value, run:Value, ready:Value):
     with Audio() as audio:
         device_index = get_audio_device(audio)
         config = {
@@ -190,6 +191,7 @@ def microphone(conn:Connection, is_speaking:Value, run:Value, ready:Value):
                 if record and not is_speaking.value:
                     audio = mic.read(CHUNK_SIZE, exception_on_overflow=False)
                     conn.send_bytes(audio)
+                    fft_conn.send_bytes(audio)
                 elif record:
                     mic.stop_stream()
                     record = False

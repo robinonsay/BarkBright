@@ -7,7 +7,8 @@
 import re
 import time
 import numpy as np
-from barkbright import bb_config
+from scipy import fft
+from barkbright import bb_config, IN_RATE
 from multiprocessing.connection import Connection
 from multiprocessing import Process, Pipe, Value
 IS_RPI = bb_config['device'] == 'rpi'
@@ -109,7 +110,7 @@ def decrease_brightness(neo_leds:NeoPixelLEDStrip, run_function:Value, phrase:st
     neo_leds.set_brightness(1 - amount)
     neo_leds.show()
 
-def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
+def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connection):
     party_colors = np.array([
         bb_config['colors']['red'],
         bb_config['colors']['orange'],
@@ -123,12 +124,18 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
     remainder = neo_leds.strip.shape[0] % party_colors.shape[0]
     party_colors = np.concatenate([np.tile(party_colors, (n_tiles, 1)), party_colors[:remainder, :]])
     i = 0
+    MAX_BASS = 0
     while run_function.value:
-        neo_leds.strip[:] = party_colors
-        party_colors = np.roll(party_colors, i, axis=0)
-        time.sleep(0.1)
-        i = (i + 1) % party_colors.shape[0]
-        neo_leds.show()
+        if fft_conn.poll(0.1):
+            audio_bytes = fft_conn.recv()
+            audio = np.frombuffer(audio_bytes, dtype=np.int16)
+            audio = audio.astype(np.float32, order='C') / 2**15
+            audio_fft = np.abs(fft.fft(audio))
+            bass = np.max(audio_fft[40:500])
+            MAX_BASS = bass if bass > MAX_BASS else MAX_BASS
+            bass_norm = bass / MAX_BASS
+            neo_leds.set_brightness(bass_norm)
+            neo_leds.show()
 
 def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
     color_animation = [

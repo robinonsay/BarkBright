@@ -135,7 +135,7 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             bass = np.mean(audio_fft[16:256])
             MAX_BASS = bass if bass > MAX_BASS else MAX_BASS
             bass_norm = bass / MAX_BASS
-            arglights = bass_norm * neo_leds.strip.shape[0] // 2
+            arglights = int(bass_norm * neo_leds.strip.shape[0] // 2)
             neo_leds.strip[:arglights] = party_colors[:arglights]
             neo_leds.strip[-arglights:] = party_colors[:arglights]
             neo_leds.show()

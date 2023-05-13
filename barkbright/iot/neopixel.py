@@ -137,7 +137,7 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
     fft_conn.send(True)
     start = time.time()
     buffer = list()
-    BUFFER_SIZE = 500
+    BUFFER_SIZE = 50
     while run_function.value:
         if fft_conn.poll(0.1):
             audio_bytes = fft_conn.recv_bytes()

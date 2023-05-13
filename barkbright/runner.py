@@ -188,7 +188,7 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
     while run_function.value:
         neo_leds.leds[:] = party_colors
         party_colors = np.roll(party_colors, i, axis=0)
-        time.sleep(0.5)
+        time.sleep(0.1)
         i = (i + 1) % party_colors.shape[0]
         neo_leds.show()
 
@@ -203,7 +203,7 @@ def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
     n_tiles = neo_leds.leds.shape[0] // sunset_colors.shape[0]
     remainder = neo_leds.leds.shape[0] % sunset_colors.shape[0]
     sunset_colors = np.concatenate([np.tile(sunset_colors, (n_tiles, 1)), sunset_colors[:remainder, :]])
-    sig = 2
+    sig = 1
     mu = 0
     x = np.linspace(-3, 3, sunset_colors.shape[0])
     gaussian = np.exp(-np.power(x - mu, 2.) / (2 * np.power(sig, 2.))) + 1
@@ -213,7 +213,7 @@ def sunset_mode(neo_leds:NeoPixelLEDStrip, run_function:Value):
     while run_function.value:
         neo_leds.leds[:] = np.floor(sunset_colors * gaussian)
         sunset_colors = np.roll(sunset_colors, i, axis=0)
-        time.sleep(0.5)
+        time.sleep(0.1)
         i = (i + 1) % sunset_colors.shape[0]
         neo_leds.show()
 

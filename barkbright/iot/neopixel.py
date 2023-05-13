@@ -159,7 +159,7 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             neo_leds.strip[b:] = background_color[b:]
             neo_leds.show()
             if 60 < time.time() - start:
-                MAX_BASS = 1
+                buffer.clear()
                 start = time.time()
     fft_conn.send(False)
 

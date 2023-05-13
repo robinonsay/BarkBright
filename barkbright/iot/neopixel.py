@@ -137,9 +137,9 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             MAX_BASS = bass if bass > MAX_BASS else MAX_BASS
             bass_norm = bass / MAX_BASS
             arglights = int(bass_norm * neo_leds.strip.shape[0] // 2)
-            neo_leds.strip[:arglights] = party_colors[:arglights]
-            neo_leds.strip[arglights:-arglights] = (0,0,0)
-            neo_leds.strip[-arglights:] = party_colors[-arglights:]
+            neo_leds.strip[:arglights] = (0,0,0)
+            neo_leds.strip[arglights:-arglights] = party_colors[arglights:-arglights]
+            neo_leds.strip[-arglights:] = (0,0,0)
             neo_leds.show()
             if 60 < time.time() - start:
                 MAX_BASS = 1

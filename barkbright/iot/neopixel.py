@@ -6,6 +6,7 @@
 # various animations on a strip of NeoPixels.
 import re
 import time
+import heapq
 import numpy as np
 from scipy import fft
 from barkbright import bb_config, IN_RATE
@@ -144,9 +145,9 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             audio = audio.astype(np.float32, order='C') / 2**15
             audio_fft = np.abs(fft.fft(audio))
             bass = np.mean(audio_fft[16:200])
-            buffer.append(bass)
+            heapq.heappush(buffer, bass)
             if len(buffer) >= BUFFER_SIZE:
-                buffer.pop(0)
+                heapq.heappop(buffer)
             max_bass = np.mean(buffer)
             bass_norm = bass / max_bass
             arglights = int(bass_norm * neo_leds.strip.shape[0] // 2)

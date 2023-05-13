@@ -157,11 +157,12 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
             max_bass = np.mean(bass_buffer)
             mid_range_norm = mid_range / max_mids
             bass_norm = bass / max_bass
-            arglights_bass = int(bass_norm * neo_leds.strip.shape[0] // 3)
-            arglights_mids = int(mid_range_norm * neo_leds.strip.shape[0] // 3)
+            third_lights = neo_leds.strip.shape[0] // 3
+            arglights_bass = int(bass_norm * third_lights)
+            arglights_mids = min(third_lights, int(mid_range_norm * third_lights))
             center = neo_leds.strip.shape[0] // 2
-            a = max(0, center-arglights_bass)
-            b = min(neo_leds.strip.shape[0], center+arglights_bass)
+            a = max(third_lights // 2, center-arglights_bass)
+            b = min(third_lights + third_lights // 2, center+arglights_bass)
             neo_leds.strip[:arglights_mids] = bb_config['colors']['cyan']
             neo_leds.strip[arglights_mids:a] = background_color[arglights_mids:a]
             neo_leds.strip[a:b] = party_colors[a:b]
@@ -172,6 +173,9 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
                 last = heapq.heappop(bass_buffer)
                 bass_buffer.clear()
                 heapq.heappush(bass_buffer, last)
+                last = heapq.heappop(mids_buffer)
+                mids_buffer.clear()
+                heapq.heappush(mids_buffer, last)
                 start = time.time()
     fft_conn.send(False)
 

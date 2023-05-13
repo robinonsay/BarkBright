@@ -128,7 +128,7 @@ def party_mode(neo_leds:NeoPixelLEDStrip, run_function:Value, fft_conn:Connectio
         bb_config['colors']['blue'],
         bb_config['colors']['purple'],
     ])
-    background_color = neo_leds.strip
+    background_color = neo_leds.strip.copy()
     n_tiles = neo_leds.strip.shape[0] // party_colors.shape[0]
     remainder = neo_leds.strip.shape[0] % party_colors.shape[0]
     party_colors = np.concatenate([np.tile(party_colors, (n_tiles, 1)), party_colors[:remainder, :]])

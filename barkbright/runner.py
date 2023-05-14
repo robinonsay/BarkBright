@@ -63,6 +63,7 @@ def main():
     leds = np.zeros((bb_config['led_config']['count'], 3))
     prcs_shutdown = Process(target=shutdown, args=(running, ))
     try:
+        prcs_shutdown.start()
         prcs_light_mngr.start()
         run_function.value = False
         light_mngr_conn.send((neopixel.on, None))

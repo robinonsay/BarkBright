@@ -218,7 +218,8 @@ def shutdown(run:Value):
         while run.value:
             time.sleep(0.01)
             run.value = GPIO.input(bb_config['shutdown_pin']) == GPIO.LOW
-        os.system('shutdown')
+        print('Shutting Down')
+        os.system('shutdown -s')
 
             
         

@@ -33,9 +33,9 @@ from barkbright.models import asr
 from barkbright.iot import neopixel
 from multiprocessing import Process, Pipe, Value
 from multiprocessing.connection import Connection
-# IS_RPI = bb_config['device'] == 'rpi'
-# if IS_RPI:
-#     from RPi import GPIO
+IS_RPI = bb_config['device'] == 'rpi'
+if IS_RPI:
+    from RPi import GPIO
 
 def led_listening(light_mngr_conn, leds):
     third_len = len(leds) // 3
@@ -61,9 +61,9 @@ def main():
     light_mngr_conn,  child_light_mngr_conn = Pipe()
     prcs_light_mngr = Process(target=neopixel.light_manager, args=(child_light_mngr_conn, running, run_function))
     leds = np.zeros((bb_config['led_config']['count'], 3))
-    # prcs_shutdown = Process(target=shutdown, args=(running, ))
+    prcs_shutdown = Process(target=shutdown, args=(running, ))
     try:
-        # prcs_shutdown.start()
+        prcs_shutdown.start()
         prcs_light_mngr.start()
         run_function.value = False
         light_mngr_conn.send((neopixel.on, None))
@@ -211,15 +211,15 @@ def microphone(conn:Connection, fft_conn:Connection, is_speaking:Value, run:Valu
                     mic.start_stream()
                     record = True
 
-# def shutdown(run:Value):
-#     if IS_RPI:
-#         GPIO.setmode(GPIO.BOARD)
-#         GPIO.setup(bb_config['shutdown_pin'], GPIO.IN)
-#         while run.value:
-#             time.sleep(0.01)
-#             run.value = GPIO.input(bb_config['shutdown_pin']) == GPIO.LOW
-#         print('Shutting Down')
-#         os.system('shutdown -s')
+def shutdown(run:Value):
+    if IS_RPI:
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(bb_config['shutdown_pin'], GPIO.IN)
+        while run.value:
+            time.sleep(0.01)
+            run.value = GPIO.input(bb_config['shutdown_pin']) == GPIO.LOW
+        print('Shutting Down')
+        os.system('shutdown -s')
 
             
         

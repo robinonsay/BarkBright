@@ -213,11 +213,12 @@ def microphone(conn:Connection, fft_conn:Connection, is_speaking:Value, run:Valu
 
 def shutdown(run:Value):
     if IS_RPI:
-        GPIO.setmode(GPIO.BOARD)
+        GPIO.setmode(GPIO.BCM)
         GPIO.setup(bb_config['shutdown_pin'], GPIO.IN)
         while run.value:
             time.sleep(0.01)
             run.value = GPIO.input(bb_config['shutdown_pin']) == GPIO.LOW
+        GPIO.cleanup()
         print('Shutting Down')
         os.system('shutdown')
 

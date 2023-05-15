@@ -220,7 +220,7 @@ def shutdown(run:Value):
             run.value = GPIO.input(bb_config['shutdown_pin']) == GPIO.LOW
         GPIO.cleanup()
         print('Shutting Down')
-        os.system('shutdown')
+        os.system('sudo shutdown now')
 
             
         

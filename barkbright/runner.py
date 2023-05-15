@@ -63,7 +63,6 @@ def main():
     leds = np.zeros((bb_config['led_config']['count'], 3))
     prcs_shutdown = Process(target=shutdown, args=(running, ))
     try:
-        prcs_shutdown.start()
         prcs_light_mngr.start()
         run_function.value = False
         light_mngr_conn.send((neopixel.on, None))
@@ -74,6 +73,7 @@ def main():
         prcs_spkr.start()
         transition = 'root'
         reset = True
+        prcs_shutdown.start()
         for phrase, is_done in asr.listen(parent_mic_conn, ready):
             if not running.value:
                 break
@@ -219,7 +219,7 @@ def shutdown(run:Value):
             time.sleep(0.01)
             run.value = GPIO.input(bb_config['shutdown_pin']) == GPIO.LOW
         print('Shutting Down')
-        os.system('shutdown -s')
+        os.system('shutdown')
 
             
         
